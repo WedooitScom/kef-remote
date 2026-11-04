@@ -55,8 +55,8 @@ public final class SpeakerDiscovery {
 
     private var browsers: [NWBrowser] = []
     private var resolving: Set<String> = []
-    private let queue = DispatchQueue(label: "fr.deloyer.kefremote.discovery")
-    private static let log = Logger(subsystem: "fr.deloyer.kefremote", category: "discovery")
+    private let queue = DispatchQueue(label: "fr.wedooit.kefremote.discovery")
+    private static let log = Logger(subsystem: "fr.wedooit.kefremote", category: "discovery")
 
     public init() {}
 

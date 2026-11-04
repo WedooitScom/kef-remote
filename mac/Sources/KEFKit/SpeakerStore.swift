@@ -51,7 +51,7 @@ public final class SpeakerStore {
 
     static let playRetries = 4
     static let playRetryDelay: Duration = .milliseconds(1500)
-    private static let log = Logger(subsystem: "fr.deloyer.kefremote", category: "store")
+    private static let log = Logger(subsystem: "fr.wedooit.kefremote", category: "store")
 
     public init(backoffMin: Double = 1, backoffMax: Double = 30, pollTimeout: Int = 10) {
         self.backoffMin = backoffMin

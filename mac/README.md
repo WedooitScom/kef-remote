@@ -92,7 +92,7 @@ faites clic droit › Ouvrir.
    dans Réglages Système › Confidentialité et sécurité › Réseau local.
 2. Sans adresse configurée, la fenêtre liste les enceintes KEF détectées :
    cliquez sur « Utiliser ». Sinon, saisissez l'IP dans les Réglages (⌘,).
-   L'adresse est mémorisée (UserDefaults, `fr.deloyer.kefremote` / `speakerHost`).
+   L'adresse est mémorisée (UserDefaults, `fr.wedooit.kefremote` / `speakerHost`).
 3. Les radios favorites sont dans
    `~/Library/Application Support/KEF Remote/favorites.json`, au même format que
    le client web (`{version, suggest_history, items: [{id, title, path, icon, description}]}`).
@@ -235,3 +235,7 @@ Points d'API (relevés sur une LS50 Wireless II, firmware V41192) :
   non vérifiées sur matériel.
 - Consulter une station (`getRows` sur son path) semble l'ajouter à l'historique
   airable de l'enceinte : c'est ce que fait la lecture d'une station.
+
+## Licence
+
+MIT, voir [LICENSE](../LICENSE).

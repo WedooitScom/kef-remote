@@ -230,3 +230,7 @@ courante, import, diffusion SSE, proxy de logos, et le décodage de rows airable
 - La découverte mDNS repose sur les annonces AirPlay/Chromecast/Spotify ; le contenu des
   enregistrements TXT des enceintes KEF n'a pas été vérifié.
 - Pas d'authentification : à n'exposer que sur un réseau local de confiance.
+
+## Licence
+
+MIT, voir [LICENSE](LICENSE). Le client web s'appuie sur [pykefcontrol](https://github.com/N0ciple/pykefcontrol) (MIT).

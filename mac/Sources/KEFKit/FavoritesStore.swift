@@ -17,7 +17,7 @@ public final class FavoritesStore {
     public let fileURL: URL
     public private(set) var lastError: String?
 
-    private static let log = Logger(subsystem: "fr.deloyer.kefremote", category: "favorites")
+    private static let log = Logger(subsystem: "fr.wedooit.kefremote", category: "favorites")
 
     /// `~/Library/Application Support/KEF Remote/<name>`
     public static func defaultURL(fileName: String = "favorites.json") -> URL {

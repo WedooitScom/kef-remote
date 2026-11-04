@@ -3,6 +3,8 @@ name = "kef-remote"
 version = "0.1.0"
 description = "Client local (FastAPI + PWA) pour piloter des enceintes KEF LS50 Wireless II / LSX II / LS60 via pykefcontrol."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 # pykefcontrol demande >=3.10 ; on cible 3.12/3.13 (épinglé dans .python-version).
 requires-python = ">=3.12,<3.14"
 dependencies = [

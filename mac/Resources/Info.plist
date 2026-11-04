@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>KEF Remote</string>
 	<key>CFBundleIdentifier</key>
-	<string>fr.deloyer.kefremote</string>
+	<string>fr.wedooit.kefremote</string>
 	<key>CFBundleExecutable</key>
 	<string>KEFRemote</string>
 	<key>CFBundlePackageType</key>
