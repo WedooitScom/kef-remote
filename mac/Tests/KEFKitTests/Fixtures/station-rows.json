@@ -1,0 +1,140 @@
+{
+ "rowsCount": 4,
+ "rows": [
+  {
+   "mediaData": {
+    "resources": [
+     {
+      "uri": "https://1234567890.airable.io/airable/play/radio/8559024957008661/7258072619792075",
+      "bitRate": 192000,
+      "uid": "0",
+      "title": "aac, 48000 Hz, stereo, 192 kb/s",
+      "data": "https://1234567890.airable.io/airable/play/radio/8559024957008661/7258072619792075",
+      "mimeType": "audio/mp4",
+      "codec": "AAC",
+      "type": ""
+     },
+     {
+      "uri": "https://1234567890.airable.io/airable/play/radio/8559024957008661/3910353547893465",
+      "bitRate": 128000,
+      "uid": "1",
+      "title": "mp3, 48000 Hz, stereo, 128 kb/s",
+      "data": "https://1234567890.airable.io/airable/play/radio/8559024957008661/3910353547893465",
+      "mimeType": "audio/mpeg",
+      "codec": "MP3",
+      "type": ""
+     },
+     {
+      "uri": "https://1234567890.airable.io/airable/play/radio/8559024957008661/7561916810926051",
+      "bitRate": 32000,
+      "uid": "2",
+      "title": "mp3, 48000 Hz, stereo, 32 kb/s",
+      "data": "https://1234567890.airable.io/airable/play/radio/8559024957008661/7561916810926051",
+      "mimeType": "audio/mpeg",
+      "codec": "MP3",
+      "type": ""
+     }
+    ],
+    "metaData": {
+     "playbackStateChangePath": "airable:statechange",
+     "live": true,
+     "radioStation": true,
+     "slogan": "Toutes les musiques, une seule radio",
+     "serviceID": "airableRadios",
+     "maximumRetryCount": 3,
+     "prePlayPath": "airable:preplay\\?serviceType\\=airable&dataType\\=radio&objectId\\=8559024957008661",
+     "contentPlayContextPath": "airable:playContext:https://1234567890.airable.io/id/airable/radio/8559024957008661"
+    }
+   },
+   "containerPlayable": true,
+   "images": {
+    "images": [
+     {
+      "height": 64,
+      "width": 64,
+      "url": "http://static.airable.io/17/64/833948.png"
+     },
+     {
+      "height": 128,
+      "width": 128,
+      "url": "http://static.airable.io/32/92/702818.png"
+     },
+     {
+      "height": 256,
+      "width": 256,
+      "url": "http://static.airable.io/58/32/274991.png"
+     },
+     {
+      "height": 512,
+      "width": 512,
+      "url": "http://static.airable.io/04/48/126140.png"
+     },
+     {
+      "height": 1024,
+      "width": 1024,
+      "url": "http://static.airable.io/79/52/231493.png"
+     }
+    ]
+   },
+   "path": "airable:https://1234567890.airable.io/id/airable/radio/8559024957008661",
+   "containerType": "none",
+   "audioType": "audioBroadcast",
+   "icon": "http://static.airable.io/79/52/231493.png",
+   "title": "FIP",
+   "id": "airable://airable/radio/8559024957008661",
+   "type": "audio"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "containerPlayable": true,
+   "path": "airable:https://1234567890.airable.io/airable/radio/8559024957008661/networks",
+   "containerType": "none",
+   "title": "Groupe",
+   "id": "airable://airable/listing/radio.8559024957008661.networks",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airableRadios"
+    }
+   },
+   "containerPlayable": true,
+   "path": "airable:https://1234567890.airable.io/airable/radio/8559024957008661/radios",
+   "containerType": "none",
+   "title": "Radio parente",
+   "id": "airable://airable/listing/radio.8559024957008661.radios",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airablePodcasts"
+    }
+   },
+   "containerPlayable": true,
+   "path": "airable:https://1234567890.airable.io/airable/radio/8559024957008661/feeds",
+   "containerType": "none",
+   "title": "Podcasts",
+   "id": "airable://airable/listing/radio.8559024957008661.feeds",
+   "type": "container"
+  }
+ ],
+ "roles": {
+  "mediaData": {
+   "metaData": {
+    "serviceID": "airableRadios"
+   }
+  },
+  "path": "airable:https://1234567890.airable.io/id/airable/radio/8559024957008661",
+  "containerType": "none",
+  "icon": "",
+  "title": "FIP",
+  "description": "La radio musicale la plus éclectique",
+  "id": "airable://airable/radio/8559024957008661"
+ }
+}

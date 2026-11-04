@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KEF Remote</title>
+  <meta name="description" content="Télécommande locale pour enceintes KEF LS50 Wireless II, LSX II et LS60.">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f1ee" media="(prefers-color-scheme: light)">
+  <meta name="color-scheme" content="dark light">
+  <!-- PWA légère : installable depuis l'écran d'accueil -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KEF">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body data-power="unknown" data-online="false">
+  <!-- Fond flou dérivé de la pochette (deux calques pour un fondu enchaîné) -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop-layer" id="bg-a"></div>
+    <div class="backdrop-layer" id="bg-b"></div>
+    <div class="backdrop-veil"></div>
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="speaker-id">
+        <span class="status-dot" id="status-dot" title="Hors ligne"></span>
+        <div class="speaker-text">
+          <h1 id="speaker-name">KEF</h1>
+          <p id="speaker-model" class="eyebrow">Recherche des enceintes…</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btn-settings" aria-label="Réglages" title="Réglages">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+        <button class="icon-btn power-btn" id="btn-power" aria-label="Marche / veille" title="Marche / veille">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="banner" id="banner" role="status" hidden></div>
+
+    <main class="stage">
+      <section class="now" aria-label="Lecture en cours">
+        <figure class="art" id="art">
+          <div class="art-placeholder" aria-hidden="true">
+            <span></span><span></span><span></span><i></i>
+          </div>
+          <img id="cover" alt="" decoding="async">
+        </figure>
+
+        <div class="meta">
+          <p class="eyebrow" id="source-label">—</p>
+          <div class="title-row">
+            <h2 id="title">Rien en lecture</h2>
+            <!-- Visible quand une radio airable joue : ajoute / retire la station des favoris -->
+            <button class="star-btn" id="btn-star" aria-pressed="false" aria-label="Ajouter la radio aux favoris"
+                    title="Radio favorite" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+            </button>
+          </div>
+          <p id="subtitle" class="subtitle">&nbsp;</p>
+        </div>
+
+        <div class="progress" id="progress">
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="progress-times"><span id="time-pos">0:00</span><span id="time-dur">0:00</span></div>
+        </div>
+
+        <div class="transport">
+          <button class="icon-btn lg" id="btn-prev" aria-label="Piste précédente" title="Précédente (←)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14"/><path d="M19 5 9 12l10 7z" class="fill"/></svg>
+          </button>
+          <button class="play-btn" id="btn-play" aria-label="Lecture / pause" title="Lecture / pause (espace)">
+            <svg viewBox="0 0 24 24" class="ico-play" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" class="fill"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" class="fill"/></svg>
+          </button>
+          <button class="icon-btn lg" id="btn-next" aria-label="Piste suivante" title="Suivante (→)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14"/><path d="M5 5l10 7-10 7z" class="fill"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="console" aria-label="Contrôles">
+        <div class="volume">
+          <button class="icon-btn" id="btn-vol-down" aria-label="Baisser le volume" title="Volume − (↓)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+          </button>
+
+          <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Volume"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="dial-ring dial-ring-outer" cx="100" cy="100" r="96"/>
+              <path class="dial-track" id="dial-track"/>
+              <path class="dial-value" id="dial-value"/>
+              <circle class="dial-face" cx="100" cy="100" r="62"/>
+              <circle class="dial-ring" cx="100" cy="100" r="48"/>
+              <circle class="dial-knob" id="dial-knob" r="6" cx="100" cy="100"/>
+            </svg>
+            <div class="dial-readout">
+              <span id="vol-value">0</span>
+              <small class="eyebrow">Volume</small>
+            </div>
+          </div>
+
+          <button class="icon-btn" id="btn-vol-up" aria-label="Monter le volume" title="Volume + (↑)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>
+          </button>
+        </div>
+
+        <button class="pill" id="btn-mute" aria-pressed="false" title="Muet (M)">
+          <svg viewBox="0 0 24 24" class="ico-sound" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" class="fill"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+          <svg viewBox="0 0 24 24" class="ico-muted" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" class="fill"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg>
+          <span>Muet</span>
+        </button>
+
+        <div class="sources">
+          <p class="eyebrow">Source</p>
+          <div class="source-grid" id="sources" role="radiogroup" aria-label="Source"></div>
+        </div>
+      </section>
+
+      <!-- Radios favorites (stockées localement dans favorites.json) -->
+      <section class="radios" id="radios" aria-labelledby="radios-title">
+        <header class="radios-head">
+          <p class="eyebrow" id="radios-title">Radios favorites</p>
+          <div class="radios-actions">
+            <button class="pill sm" id="btn-radio-search" title="Rechercher une radio">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+              <span>Rechercher</span>
+            </button>
+            <button class="pill sm ghost" id="btn-radio-edit" aria-pressed="false" hidden>Modifier</button>
+          </div>
+        </header>
+
+        <!-- Premier lancement : l'historique radio de l'enceinte proposé en suggestions -->
+        <div class="suggest" id="radio-suggest" hidden>
+          <p class="suggest-text">Vos radios récentes sur l'enceinte. Touchez l'étoile pour les garder en favoris.</p>
+          <ul class="station-list" id="suggest-list"></ul>
+          <div class="suggest-actions">
+            <button class="pill sm ghost" id="btn-suggest-dismiss">Plus tard</button>
+            <button class="pill sm solid" id="btn-suggest-import">Tout ajouter</button>
+          </div>
+        </div>
+
+        <div class="fav-grid" id="fav-grid" role="list"></div>
+        <p class="fav-empty muted" id="fav-empty" hidden>
+          Aucune radio favorite pour l'instant. Recherchez une station puis touchez l'étoile.
+        </p>
+      </section>
+
+      <!-- Affiché quand l'enceinte est en veille -->
+      <div class="standby" id="standby" hidden>
+        <button class="standby-btn" id="btn-wake">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+          <span>Allumer</span>
+        </button>
+        <p class="eyebrow">Enceintes en veille</p>
+      </div>
+    </main>
+
+    <footer class="hints" aria-hidden="true">
+      <span><kbd>espace</kbd> lecture</span>
+      <span><kbd>↑</kbd><kbd>↓</kbd> volume</span>
+      <span><kbd>←</kbd><kbd>→</kbd> piste</span>
+      <span><kbd>M</kbd> muet</span>
+      <span><kbd>1</kbd>–<kbd>9</kbd> radio favorite</span>
+    </footer>
+  </div>
+
+  <!-- Réglages : adresse des enceintes + découverte mDNS -->
+  <dialog id="settings">
+    <form method="dialog" class="settings-card" id="settings-form">
+      <header>
+        <p class="eyebrow">Réglages</p>
+        <h2>Vos enceintes</h2>
+        <p class="muted" id="settings-intro">Indiquez l'adresse IP de l'enceinte principale, ou lancez une recherche sur le réseau.</p>
+      </header>
+
+      <label class="field">
+        <span class="eyebrow">Adresse IP</span>
+        <input id="host-input" name="host" inputmode="decimal" autocomplete="off" spellcheck="false"
+               placeholder="192.168.1.42">
+      </label>
+      <p class="probe-result muted" id="probe-result" aria-live="polite"></p>
+
+      <div class="discover">
+        <button type="button" class="pill" id="btn-discover">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+          <span>Rechercher sur le réseau</span>
+        </button>
+        <ul class="discover-list" id="discover-list"></ul>
+      </div>
+
+      <footer class="settings-actions">
+        <button type="button" class="pill ghost" id="btn-probe">Tester</button>
+        <span class="spacer"></span>
+        <button type="button" class="pill ghost" id="btn-cancel">Fermer</button>
+        <button type="submit" class="pill solid" id="btn-save" value="save">Enregistrer</button>
+      </footer>
+      <p class="muted small" id="config-note"></p>
+    </form>
+  </dialog>
+
+  <!-- Recherche de radios (historique de l'enceinte quand le champ est vide) -->
+  <dialog id="radio-search" class="search-dialog">
+    <div class="search-card">
+      <header class="search-head">
+        <label class="search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+          <input id="radio-query" type="search" placeholder="Nom de la radio, genre…" autocomplete="off"
+                 spellcheck="false" enterkeyhint="search" aria-label="Rechercher une radio">
+        </label>
+        <button type="button" class="pill ghost" id="btn-search-close">Fermer</button>
+      </header>
+      <p class="eyebrow search-status" id="search-status" aria-live="polite">Écoutées récemment</p>
+      <ul class="station-list" id="search-results"></ul>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

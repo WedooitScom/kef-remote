@@ -1,0 +1,140 @@
+{
+ "rowsCount": 3,
+ "rows": [
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airableRadios"
+    }
+   },
+   "containerPlayable": true,
+   "images": {
+    "images": [
+     {
+      "height": 64,
+      "width": 64,
+      "url": "http://static.airable.io/08/13/675285.png"
+     },
+     {
+      "height": 128,
+      "width": 128,
+      "url": "http://static.airable.io/71/67/706063.png"
+     },
+     {
+      "height": 256,
+      "width": 256,
+      "url": "http://static.airable.io/42/54/791051.png"
+     },
+     {
+      "height": 512,
+      "width": 512,
+      "url": "http://static.airable.io/49/79/555781.png"
+     }
+    ]
+   },
+   "path": "airable:https://1234567890.airable.io/id/airable/radio/6969495512079448",
+   "containerType": "none",
+   "audioType": "audioBroadcast",
+   "icon": "http://static.airable.io/49/79/555781.png",
+   "title": "RFM",
+   "id": "airable://airable/radio/6969495512079448",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airableRadios"
+    }
+   },
+   "containerPlayable": true,
+   "images": {
+    "images": [
+     {
+      "height": 64,
+      "width": 64,
+      "url": "http://static.airable.io/24/67/568601.png"
+     },
+     {
+      "height": 128,
+      "width": 128,
+      "url": "http://static.airable.io/26/62/637271.png"
+     },
+     {
+      "height": 256,
+      "width": 256,
+      "url": "http://static.airable.io/73/09/420670.png"
+     },
+     {
+      "height": 512,
+      "width": 512,
+      "url": "http://static.airable.io/35/59/795614.png"
+     },
+     {
+      "height": 1024,
+      "width": 1024,
+      "url": "http://static.airable.io/61/70/587023.png"
+     }
+    ]
+   },
+   "path": "airable:https://1234567890.airable.io/id/airable/radio/3881444309372455",
+   "containerType": "none",
+   "audioType": "audioBroadcast",
+   "icon": "http://static.airable.io/61/70/587023.png",
+   "title": "bel RTL Génération 80 90",
+   "id": "airable://airable/radio/3881444309372455",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airableRadios"
+    }
+   },
+   "containerPlayable": true,
+   "images": {
+    "images": [
+     {
+      "height": 64,
+      "width": 64,
+      "url": "http://static.airable.io/45/37/419905.png"
+     },
+     {
+      "height": 128,
+      "width": 128,
+      "url": "http://static.airable.io/10/14/970983.png"
+     },
+     {
+      "height": 256,
+      "width": 256,
+      "url": "http://static.airable.io/23/87/887519.png"
+     },
+     {
+      "height": 512,
+      "width": 512,
+      "url": "http://static.airable.io/53/75/647703.png"
+     }
+    ]
+   },
+   "path": "airable:https://1234567890.airable.io/id/airable/radio/7149792893789709",
+   "containerType": "none",
+   "audioType": "audioBroadcast",
+   "icon": "http://static.airable.io/53/75/647703.png",
+   "title": "CHERIE FM",
+   "id": "airable://airable/radio/7149792893789709",
+   "type": "container"
+  }
+ ],
+ "roles": {
+  "mediaData": {
+   "metaData": {
+    "serviceID": "airable"
+   }
+  },
+  "path": "airable:https://1234567890.airable.io/airable/radios/history",
+  "containerType": "none",
+  "icon": "",
+  "title": "Historique utilisation",
+  "description": "",
+  "id": "airable://airable.radios/listing/history"
+ }
+}

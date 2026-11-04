@@ -1,0 +1,119 @@
+{
+ "state": "playing",
+ "controls": {
+  "like": false,
+  "playMode": {
+   "shuffleRepeatOne": false,
+   "shuffleRepeatAll": false,
+   "repeatOne": false,
+   "shuffle": false,
+   "repeatAll": false
+  },
+  "seekTime": false,
+  "previous": false,
+  "seekTrack": false,
+  "next_": false,
+  "seekBytes": false,
+  "dislike": false
+ },
+ "mediaRoles": {
+  "mediaData": {
+   "resources": [
+    {
+     "bitRate": 192000,
+     "uid": "0",
+     "title": "mp3, 44100 Hz, stereo, 192 kb/s",
+     "data": "https://1234567890.airable.io/airable/play/radio/3881444309372455/1218487960286438",
+     "codec": "MP3",
+     "mimeType": "audio/mpeg",
+     "type": ""
+    }
+   ],
+   "metaData": {
+    "playbackStateChangePath": "airable:statechange",
+    "live": true,
+    "slogan": "",
+    "radioStation": true,
+    "serviceID": "airableRadios",
+    "maximumRetryCount": 1,
+    "prePlayPath": "airable:preplay\\?serviceType\\=airable&dataType\\=radio&objectId\\=3881444309372455",
+    "contentPlayContextPath": "airable:playContext:https://1234567890.airable.io/id/airable/radio/3881444309372455"
+   }
+  },
+  "containerPlayable": true,
+  "path": "airable:https://1234567890.airable.io/id/airable/radio/3881444309372455",
+  "context": {
+   "path": "airable:context:AAAAJgBBAGoAbwB1AHQAZQByACAAYQB1AHgAIABmAGEAdgBvAHIAaQBzAAABBABoAHQAdABwAHMAOgAvAC8AOAA0ADQAOAAyADMAOQA3ADcAMAAuAGEAaQByAGEAYgBsAGUALgBpAG8ALwBhAGMAdABpAG8AbgBzAC8AZgBhAHYAbwByAGkAdABlAHMALwBhAGkAcgBhAGIAbABlAC8AcgBhAGQAaQBvAC8AMwA4ADgAMQA0ADQANAAzADAAOQAzADcAMgA0ADUANQAvAGkAbgBzAGUAcgB0AD8AcgA9ACUAMgBGAGkAZAAlADIARgBhAGkAcgBhAGIAbABlACUAMgBGAHIAYQBkAGkAbwAlADIARgAzADgAOAAxADQANAA0ADMAMAA5ADMANwAyADQANQA1AAAAUABhAGkAcgBhAGIAbABlADoALwAvAGEAaQByAGEAYgBsAGUALwBhAGMAdABpAG8AbgAvAGYAYQB2AG8AcgBpAHQAZQAuAGkAbgBzAGUAcgB0AAA\\="
+  },
+  "containerType": "none",
+  "icon": "http://static.airable.io/61/70/587023.png",
+  "audioType": "audioBroadcast",
+  "title": "bel RTL Génération 80 90",
+  "id": "airable://airable/radio/3881444309372455",
+  "type": "audio"
+ },
+ "trackRoles": {
+  "mediaData": {
+   "activeResource": {
+    "bitsPerSample": 16,
+    "maxBitRate": 192018,
+    "nominalBitRate": 192000,
+    "bitRate": 192000,
+    "uid": "0",
+    "nrAudioChannels": 2,
+    "minBitRate": 191712,
+    "title": "mp3, 44100 Hz, stereo, 192 kb/s",
+    "data": "https://1234567890.airable.io/airable/play/radio/3881444309372455/1218487960286438",
+    "codec": "MP3",
+    "sampleFrequency": 44100,
+    "mimeType": "audio/mpeg",
+    "type": ""
+   },
+   "resources": [
+    {
+     "bitsPerSample": 16,
+     "maxBitRate": 192018,
+     "nominalBitRate": 192000,
+     "bitRate": 192000,
+     "uid": "0",
+     "nrAudioChannels": 2,
+     "minBitRate": 191712,
+     "title": "mp3, 44100 Hz, stereo, 192 kb/s",
+     "data": "https://1234567890.airable.io/airable/play/radio/3881444309372455/1218487960286438",
+     "codec": "MP3",
+     "sampleFrequency": 44100,
+     "mimeType": "audio/mpeg",
+     "type": ""
+    }
+   ],
+   "metaData": {
+    "organization": "-",
+    "playbackStateChangePath": "airable:statechange",
+    "live": true,
+    "prePlayTimeOffset": 0,
+    "slogan": "",
+    "radioStation": true,
+    "serviceID": "airableRadios",
+    "maximumRetryCount": 1,
+    "prePlayPath": "airable:preplay\\?serviceType\\=airable&dataType\\=radio&objectId\\=3881444309372455",
+    "contentPlayContextPath": "airable:playContext:https://1234567890.airable.io/id/airable/radio/3881444309372455"
+   }
+  },
+  "containerPlayable": true,
+  "path": "airable:https://1234567890.airable.io/id/airable/radio/3881444309372455",
+  "context": {
+   "path": "airable:context:AAAAJgBBAGoAbwB1AHQAZQByACAAYQB1AHgAIABmAGEAdgBvAHIAaQBzAAABBABoAHQAdABwAHMAOgAvAC8AOAA0ADQAOAAyADMAOQA3ADcAMAAuAGEAaQByAGEAYgBsAGUALgBpAG8ALwBhAGMAdABpAG8AbgBzAC8AZgBhAHYAbwByAGkAdABlAHMALwBhAGkAcgBhAGIAbABlAC8AcgBhAGQAaQBvAC8AMwA4ADgAMQA0ADQANAAzADAAOQAzADcAMgA0ADUANQAvAGkAbgBzAGUAcgB0AD8AcgA9ACUAMgBGAGkAZAAlADIARgBhAGkAcgBhAGIAbABlACUAMgBGAHIAYQBkAGkAbwAlADIARgAzADgAOAAxADQANAA0ADMAMAA5ADMANwAyADQANQA1AAAAUABhAGkAcgBhAGIAbABlADoALwAvAGEAaQByAGEAYgBsAGUALwBhAGMAdABpAG8AbgAvAGYAYQB2AG8AcgBpAHQAZQAuAGkAbgBzAGUAcgB0AAA\\="
+  },
+  "containerType": "none",
+  "icon": "http://static.airable.io/61/70/587023.png",
+  "audioType": "audioBroadcast",
+  "title": "Laura Branigan - Self Control",
+  "id": "airable://airable/radio/3881444309372455",
+  "type": "audio"
+ },
+ "status": {
+  "byteSeek": false,
+  "duration": 0,
+  "timeSeek": false
+ }
+}

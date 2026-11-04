@@ -1,0 +1,34 @@
+{
+ "rowsCount": 2,
+ "roles": {
+  "path": "airable:form7",
+  "containerType": "context",
+  "title": "Recherche",
+  "id": "airable://airable.radios/form/search",
+  "type": "container"
+ },
+ "rows": [
+  {
+   "path": "airable:form7:q",
+   "value": {
+    "string_": "",
+    "type": "string_"
+   },
+   "title": "A recherche de",
+   "longDescription": "Que cherchez-vous ?",
+   "modifiable": true,
+   "edit": {
+    "minLength": 1
+   },
+   "id": "airable://airable/field/q",
+   "type": "value"
+  },
+  {
+   "path": "airable:form7:submit",
+   "title": "Recherche",
+   "id": "airable://airable/button/submit",
+   "type": "action"
+  }
+ ],
+ "rowsVersion": 0
+}
