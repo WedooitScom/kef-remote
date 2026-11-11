@@ -152,8 +152,8 @@ struct BaladeurDevice: View {
         let pad = width * 0.075
         let screenWidth = width - pad * 2
         let screenHeight = screenWidth * (compact ? 0.72 : 0.76)
-        let wheel = width * (compact ? 0.46 : 0.64)
-        let height = screenHeight + wheel + pad * (compact ? 2.8 : 4.2)
+        let wheel = width * (compact ? 0.62 : 0.64)
+        let height = screenHeight + wheel + pad * (compact ? 3.4 : 4.2)
         let screen = effectiveScreen
         let rows = rows(for: screen)
         VStack(spacing: 0) {
@@ -1049,14 +1049,14 @@ struct BaladeurMiniPlayer: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            BaladeurDevice(width: 216, compact: true)
+            BaladeurDevice(width: 176, compact: true)
             MiniPlayerFooter()
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 4)
         }
         .padding(12)
-        .frame(width: 240)
+        .frame(width: 212)
         .background(BaladeurPalette.window(scheme == .dark))
     }
 }
