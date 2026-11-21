@@ -45,13 +45,54 @@ struct PixelArtTests {
         #expect(PixelFont.width(of: "ça") == PixelFont.width(of: "ÇA"))
     }
 
+    @Test func coversSpanishAndItalianLetters() {
+        for ch in "ÑÁÉÍÓÚÜÀÈÌÒÙ¿¡ÃÕ–—‹›" {
+            #expect(PixelFont.covers(ch), "glyphe manquant : \(ch)")
+            let glyph = PixelFont.glyph(for: ch)
+            #expect(glyph.rows.count == PixelFont.cellHeight)
+            #expect(glyph.litCount > 0, "glyphe vide : \(ch)")
+        }
+        // Tilde au-dessus du N, capitale intacte ; ¿ est un ? retourné.
+        let n = PixelFont.glyph(for: "N"), eñe = PixelFont.glyph(for: "Ñ")
+        #expect(eñe != n)
+        for row in PixelFont.capTop..<(PixelFont.capTop + PixelFont.capHeight) { #expect(eñe.rows[row] == n.rows[row]) }
+        // ¿ : le ? tourné d'un demi-tour (point en haut).
+        let question = PixelFont.glyph(for: "?"), inverted = PixelFont.glyph(for: "¿")
+        for y in 0..<PixelFont.capHeight {
+            for x in 0..<question.width {
+                #expect(inverted.isOn(x: x, y: PixelFont.capTop + y)
+                    == question.isOn(x: question.width - 1 - x, y: PixelFont.capTop + PixelFont.capHeight - 1 - y))
+            }
+        }
+        #expect(PixelFont.normalize("¿qué pasó? ¡sì!") == "¿QUÉ PASÓ? ¡SÌ!")
+    }
+
+    @Test func japaneseUsesTheSystemFontRasterized() {
+        for ch in "スタンバイ再生音量設定ラジオ、ー" {
+            #expect(PixelFont.usesSystemFont(ch), "\(ch)")
+            #expect(!PixelFont.covers(ch))
+            let glyph = PixelFont.glyph(for: ch)
+            #expect(glyph != PixelFont.fallback, "damier pour \(ch)")
+            #expect(glyph.rows.count == PixelFont.cellHeight)
+            #expect(glyph.litCount > 0)
+            #expect(glyph.width >= 3 && glyph.width <= PixelFont.cellHeight)
+        }
+        // Deux caractères différents, deux glyphes différents ; même caractère, même glyphe (cache).
+        #expect(PixelFont.glyph(for: "再") != PixelFont.glyph(for: "生"))
+        #expect(PixelFont.glyph(for: "再") == PixelFont.glyph(for: "再"))
+        // Mise en page mixte latin / japonais, ponctuation pleine chasse ramenée à l'ASCII.
+        #expect(PixelFont.normalize("リビング（デモ）：kef") == "リビング(デモ):KEF")
+        #expect(PixelFont.width(of: "ラジオ") > PixelFont.width(of: "AB"))
+        #expect(PixelFont.truncate("お気に入りのラジオ局をすべて表示", toWidth: 40).hasSuffix("…"))
+    }
+
     @Test func unknownCharactersFallBack() {
         // Lettre accentuée sans glyphe dédié : lettre de base.
-        #expect(!PixelFont.covers("Ñ"))
-        #expect(PixelFont.glyph(for: "Ñ") == PixelFont.glyph(for: "N"))
+        #expect(!PixelFont.covers("Å"))
         #expect(PixelFont.glyph(for: "Å") == PixelFont.glyph(for: "A"))
+        #expect(PixelFont.glyph(for: "Ŕ") == PixelFont.glyph(for: "R"))
         // Sans équivalent : damier, jamais vide.
-        for ch: Character in ["漢", "🎵", "Ж"] {
+        for ch: Character in ["🎵", "Ж", "א"] {
             #expect(PixelFont.glyph(for: ch) == PixelFont.fallback)
         }
         #expect(PixelFont.fallback.litCount > 0)

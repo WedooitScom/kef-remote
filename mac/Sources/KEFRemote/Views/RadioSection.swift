@@ -31,7 +31,7 @@ struct RadioSection: View {
 struct SearchField: View {
     @Binding var text: String
     var isSearching: Bool
-    var prompt = "Rechercher une station…"
+    var prompt: LocalizedStringKey = "Rechercher une station…"
     /// Prend le focus dès l'apparition (panneau de recherche du design immersif).
     var autoFocus = false
     @FocusState private var focused: Bool
@@ -127,7 +127,7 @@ struct StationTile: View {
                 }
                 .overlay(alignment: .topLeading) {
                     if hovering && index < 9 {
-                        Text("⌘\(index + 1)")
+                        Text(verbatim: "⌘\(index + 1)")
                             .font(.system(size: 9, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 5).padding(.vertical, 2)
                             .background(Capsule().fill(.black.opacity(0.55)))
@@ -157,7 +157,7 @@ struct StationTile: View {
         .animation(.spring(duration: 0.3), value: isCurrent)
         .help(station.description ?? station.title)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(station.title + (isCurrent ? ", en cours" : ""))
+        .accessibilityLabel(StationAccessibility.label(station.title, current: isCurrent))
         .accessibilityAddTraits(.isButton)
     }
 }

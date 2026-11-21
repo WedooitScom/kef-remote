@@ -141,7 +141,7 @@ enum FallbackArt {
             clipped.clip(to: Path(face))
             clipped.stroke(needle, with: .color(black), lineWidth: max(1, s * 0.015))
             if s >= 40 {
-                ctx.draw(Text("VU").font(.system(size: s * 0.09, weight: .bold, design: .monospaced)).foregroundStyle(black),
+                ctx.draw(Text(verbatim: "VU").font(.system(size: s * 0.09, weight: .bold, design: .monospaced)).foregroundStyle(black),
                          at: CGPoint(x: face.midX, y: face.maxY - face.height * 0.22))
             }
             ctx.stroke(Path(roundedRect: face, cornerRadius: s * 0.04), with: .color(cream.opacity(0.4)), lineWidth: max(0.5, s * 0.008))

@@ -58,7 +58,7 @@ public actor KEFHTTPClient: SpeakerClient {
 
     private func perform(_ request: URLRequest) async throws -> Data {
         let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else { throw KEFError.invalidResponse("pas de réponse HTTP") }
+        guard let http = response as? HTTPURLResponse else { throw KEFError.invalidResponse(localized("pas de réponse HTTP")) }
         guard (200..<300).contains(http.statusCode) else {
             throw KEFError.http(http.statusCode, String(decoding: data.prefix(200), as: UTF8.self))
         }
@@ -292,7 +292,7 @@ public actor KEFHTTPClient: SpeakerClient {
         case .path(let raw): path = raw
         }
         // Chemins opaques renvoyés par l'enceinte : seuls ceux d'airable sont parcourus.
-        guard path.hasPrefix("airable:") else { throw KEFError.invalidResponse("chemin airable attendu") }
+        guard path.hasPrefix("airable:") else { throw KEFError.invalidResponse(localized("chemin airable attendu")) }
         let (response, final) = try await getRows(path, from: max(0, from), count: count)
         return KEFParser.browsePage(response, path: final, offset: max(0, from))
     }
@@ -308,6 +308,6 @@ public actor KEFHTTPClient: SpeakerClient {
         try await setData("player:player/control", role: "activate",
                           value: ["control": "play", "mediaRoles": audio], roleKey: "role")
         return KEFParser.normalizeStation(audio)
-            ?? Station(id: path, title: audio["title"]?.stringValue ?? "Radio", path: path)
+            ?? Station(id: path, title: audio["title"]?.stringValue ?? localized("Radio"), path: path)
     }
 }

@@ -114,7 +114,7 @@ final class AppModel {
     }
 
     var speakerTitle: String {
-        store.snapshot.name ?? (isDemo ? "Démo" : host ?? "KEF Remote")
+        store.snapshot.name ?? (isDemo ? String(localized: "Démo") : host ?? "KEF Remote")
     }
 
     // MARK: - Radios
@@ -150,7 +150,7 @@ final class AppModel {
                 let results = try await store.searchStations(query)
                 guard !Task.isCancelled else { return }
                 searchResults = results
-                searchError = results.isEmpty ? "Aucune station trouvée" : nil
+                searchError = results.isEmpty ? String(localized: "Aucune station trouvée") : nil
             } catch {
                 guard !Task.isCancelled else { return }
                 searchResults = []
@@ -175,8 +175,7 @@ final class AppModel {
     /// Ajoute / retire une station des favoris, avec un bref message.
     func toggleFavorite(_ station: Station) {
         withAnimation { favorites.toggle(station) }
-        showToast(favorites.contains(station) ? "« \(station.title) » ajoutée aux favoris"
-                                              : "« \(station.title) » retirée des favoris")
+        showFavoriteToast(station)
     }
 
     // MARK: - Précédent / suivant
@@ -215,23 +214,24 @@ final class AppModel {
     func toggleCurrentFavorite() {
         guard let station = store.snapshot.currentStation else { return }
         favorites.toggle(station)
-        showToast(favorites.contains(station) ? "« \(station.title) » ajoutée aux favoris" : "« \(station.title) » retirée des favoris")
+        showFavoriteToast(station)
     }
 
     func importFavorites() {
         let panel = NSOpenPanel()
-        panel.title = "Importer des radios favorites"
-        panel.message = "Choisissez un fichier favorites.json (par exemple celui du client web KEF Remote)."
-        panel.prompt = "Importer"
+        panel.title = String(localized: "Importer des radios favorites")
+        panel.message = String(localized: "Choisissez un fichier favorites.json (par exemple celui du client web KEF Remote).")
+        panel.prompt = String(localized: "Importer")
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             let added = try favorites.importFile(at: url)
-            showToast(added == 0 ? "Aucune nouvelle station à importer" : "\(added) station\(added > 1 ? "s" : "") importée\(added > 1 ? "s" : "")")
+            showToast(added == 0 ? String(localized: "Aucune nouvelle station à importer")
+                                  : String(localized: "\(added) stations importées"))
         } catch {
-            showToast("Import impossible : fichier illisible")
+            showToast(String(localized: "Import impossible : fichier illisible"))
         }
     }
 
@@ -242,6 +242,11 @@ final class AppModel {
         } else {
             NSWorkspace.shared.open(url.deletingLastPathComponent())
         }
+    }
+
+    private func showFavoriteToast(_ station: Station) {
+        showToast(favorites.contains(station) ? String(localized: "« \(station.title) » ajoutée aux favoris")
+                                              : String(localized: "« \(station.title) » retirée des favoris"))
     }
 
     func showToast(_ message: String) {

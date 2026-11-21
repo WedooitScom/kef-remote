@@ -18,26 +18,26 @@ public enum AppDesign: String, CaseIterable, Identifiable, Sendable {
     /// Nom affiché (menus, réglages).
     public var label: String {
         switch self {
-        case .classique: "Classique"
-        case .hifi: "Hi-Fi analogique"
-        case .immersif: "Pochette immersive"
-        case .editorial: "Éditorial"
-        case .baladeur: "Baladeur"
-        case .pixel: "Rétro pixel"
-        case .neon: "Néon 80"
+        case .classique: localized("Classique")
+        case .hifi: localized("Hi-Fi analogique")
+        case .immersif: localized("Pochette immersive")
+        case .editorial: localized("Éditorial")
+        case .baladeur: localized("Baladeur")
+        case .pixel: localized("Rétro pixel")
+        case .neon: localized("Néon 80")
         }
     }
 
     /// Description courte (aide des vignettes de réglage).
     public var summary: String {
         switch self {
-        case .classique: "Le design d'origine, translucide et sobre."
-        case .hifi: "Façade d'ampli : molette de volume, touches, vumètre."
-        case .immersif: "La pochette en grand, couleurs tirées de l'image."
-        case .editorial: "Grande typographie, filets fins, accent orange."
-        case .baladeur: "Écran rétro et molette cliquable."
-        case .pixel: "Radio-cassette en pixel art : cadran, cassette, touches piano."
-        case .neon: "Affiche synthwave : coucher de soleil, grille, palmiers, néons rose et cyan."
+        case .classique: localized("Le design d'origine, translucide et sobre.")
+        case .hifi: localized("Façade d'ampli : molette de volume, touches, vumètre.")
+        case .immersif: localized("La pochette en grand, couleurs tirées de l'image.")
+        case .editorial: localized("Grande typographie, filets fins, accent orange.")
+        case .baladeur: localized("Écran rétro et molette cliquable.")
+        case .pixel: localized("Radio-cassette en pixel art : cadran, cassette, touches piano.")
+        case .neon: localized("Affiche synthwave : coucher de soleil, grille, palmiers, néons rose et cyan.")
         }
     }
 

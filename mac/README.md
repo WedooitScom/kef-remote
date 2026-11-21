@@ -18,6 +18,7 @@ passer par le client web Python du dossier parent.
 - « À l'écoute » (Centre de contrôle) et touches média du clavier.
 - Découverte Bonjour des enceintes + saisie manuelle de l'IP.
 - Mode démo sans enceinte.
+- Interface en français, anglais, espagnol, italien et japonais, cf. [Langues](#langues).
 
 ## Prérequis
 
@@ -72,6 +73,8 @@ en démo), jamais de `favorites.json` ; en démo, une radio est mise en lecture.
 - `--snapshot-size 900x560,620x900,min` : capture en plus chaque design à ces tailles
   de fenêtre (`main-<nom>-900x560.png` ; `min` = taille minimale du design).
 - `--appearance dark|light` : impose l'apparence (vérifier le mode sombre).
+- `--language fr|en|es|it|ja` : impose la langue pour ce lancement, sans la mémoriser
+  (équivaut à `-AppleLanguages "(ja)"`).
 - `--snapshot-extras` (démo) : ajoute la taille minimale (`-min`), la veille
   (`-veille`), l'explorateur (`-explorer`, `-explorer-genres`, `-explorer-stations`…),
   `menus.txt` (structure des menus), `reglages.png` et `artwork.png` (planche des
@@ -181,13 +184,40 @@ comportement est mutualisé (`FavoriteInteractions`, `RadioContent`,
 `NowPlayingText`, `CurrentFavoriteButton`, `FavoritesMenu`…), `SpeakerStore` et
 `AppModel` sont inchangés côté données.
 
+## Langues
+
+Français (langue de développement), anglais, espagnol, italien et japonais. L'app suit
+la langue du Mac ; Réglages › Langue permet d'en imposer une (Système, Français, English,
+Español, Italiano, 日本語) : le choix est enregistré dans `AppleLanguages` du domaine de
+l'app et s'applique au lancement suivant (bouton « Relancer maintenant »).
+
+- Chaînes : String Catalogs compilés par SwiftPM. `Sources/KEFRemote/Localizable.xcstrings`
+  (et `InfoPlist.xcstrings`) est recopié par `build-app.sh` dans les `<langue>.lproj` du
+  bundle principal, où SwiftUI cherche les `Text("…")` et où AppKit trouve la langue de
+  ses menus standard ; `Sources/KEFKit/Localizable.xcstrings` reste dans
+  `KEFRemote_KEFKit.bundle` (`Bundle.module`), lu par `KEFLocalization` dans la langue
+  retenue pour le bundle principal. Hors du bundle `.app` (tests, `swift run`), tout
+  reste en français.
+- Clés = texte français. `python3 scripts/l10n.py` compile avec extraction
+  (`-emit-localized-strings`) et liste les clés absentes des catalogues, obsolètes ou
+  non traduites ; le test « Traductions » vérifie que chaque clé a ses quatre traductions
+  avec les mêmes arguments.
+- Rétro pixel : la police bitmap couvre aussi Ñ, ¿, ¡, À È Ì Ò Ù, Á Í Ó Ú ; le japonais
+  (kana, kanji) est rastérisé à la volée avec Hiragino Sans sur la grille 10 × 10 des
+  pixels logiques. Les sérigraphies du design Hi-Fi (VOLUME, INPUT SELECTOR, PRESETS,
+  MIN / MAX) et les étiquettes d'afficheur (WIFI, BT, OPT, MUTE, MENU…) restent en
+  anglais dans toutes les langues, comme sur un appareil réel.
+- Restent tels quels : noms de pays, de genres et de langues renvoyés par airable,
+  noms des stations et des pistes (y compris fictives en démo).
+
 ## Architecture
 
 ```
 mac/
 ├── Package.swift            cible exécutable KEFRemote + bibliothèque KEFKit + tests
 ├── build-app.sh, Makefile   bundle .app, icône, signature ad hoc
-├── Resources/Info.plist     ATS, réseau local, Bonjour, catégorie musique
+├── Resources/Info.plist     ATS, réseau local, Bonjour, catégorie musique, langues
+├── scripts/l10n.py          contrôle des String Catalogs (clés manquantes, obsolètes, non traduites)
 ├── scripts/make-icon.swift  icône dessinée en Core Graphics → iconutil
 ├── Sources/KEFKit/          logique sans UI (testée)
 │   ├── KEFHTTPClient.swift  actor URLSession : getData/setData, modifyQueue/pollQueue, getRows airable
@@ -201,8 +231,10 @@ mac/
 │   ├── AppDesign.swift      designs, géométrie des molettes (Hi-Fi, Baladeur), couleur dominante
 │   ├── PixelArt.swift       Rétro pixel : police bitmap, icônes, échelle entière, défilement, géométrie du poste
 │   ├── Synthwave.swift      palette « années 80 » de l'explorateur et du design Néon 80 (dégradés, scènes)
-│   └── FallbackArtwork.swift  pochettes de repli : un style par design, graine stable par station
+│   ├── FallbackArtwork.swift  pochettes de repli : un style par design, graine stable par station
+│   └── Localization.swift   langue de l'interface, chaînes de KEFKit (Localizable.xcstrings)
 └── Sources/KEFRemote/       app SwiftUI (fenêtre, MenuBarExtra, Réglages, MediaPlayer)
+    ├── AppLanguage.swift    choix de la langue (Réglages), `--language`, relance
     └── Views/Design/        thème, racines, briques communes et les designs Hi-Fi, Immersif, Éditorial, Baladeur, Rétro pixel, Néon 80
 ```
 

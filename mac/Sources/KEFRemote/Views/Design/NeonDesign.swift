@@ -115,7 +115,7 @@ struct ChromeText: View {
     }
 
     private var label: some View {
-        Text(text.uppercased())
+        Text(text.interfaceUppercased)
             .font(Self.font(size))
             .tracking(size * 0.02)
             .multilineTextAlignment(alignment)
@@ -304,7 +304,7 @@ private struct NeonVolume: View {
             .frame(height: height + 6)
 
             if showsValue {
-                Text("\(snap.volume)")
+                Text(verbatim: "\(snap.volume)")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundStyle(tint)
                     .neonGlow(tint, radius: 4, intensity: enabled ? 0.7 : 0)
@@ -503,8 +503,8 @@ private struct NeonOffSign: View {
         let f = level
         Group {
             ZStack {
-                Text("OFF").font(font).foregroundStyle(NeonPalette.pink.opacity(0.22))
-                Text("OFF").font(font).foregroundStyle(Color(hex: 0xFFE1F1))
+                Text(verbatim: "OFF").font(font).foregroundStyle(NeonPalette.pink.opacity(0.22))
+                Text(verbatim: "OFF").font(font).foregroundStyle(Color(hex: 0xFFE1F1))
                     .neonGlow(NeonPalette.pink, radius: width * 0.06)
                     .opacity(f)
             }
@@ -605,10 +605,10 @@ private struct NeonFavoriteRow: View {
                 .accessibilityLabel("Retirer \(station.title) des favoris")
             }
             if index < 9 {
-                Text("\(index + 1)")
+                Text(verbatim: "\(index + 1)")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundStyle(current ? pal.neonTitle : pal.secondary.opacity(0.8))
-                    .help("⌘\(index + 1)")
+                    .help(Text(verbatim: "⌘\(index + 1)"))
             }
         }
         .padding(.horizontal, 8)
@@ -635,7 +635,7 @@ private struct NeonFavoriteRow: View {
         .favoriteInteractions(station: station, index: index, dropTarget: $dropTarget)
         .help(station.description ?? station.title)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(station.title + (current ? ", en cours" : ""))
+        .accessibilityLabel(StationAccessibility.label(station.title, current: current))
         .accessibilityAddTraits(.isButton)
         .accessibilityAction(named: "Retirer des favoris") { model.toggleFavorite(station) }
     }
@@ -658,7 +658,7 @@ private struct NeonFavoritesPanel: View {
                     .foregroundStyle(pal.neonTitle)
                     .neonGlow(NeonPalette.magenta, radius: 5, intensity: pal.dark ? 0.9 : 0.35)
                 if !model.favorites.items.isEmpty {
-                    Text("\(model.favorites.items.count)")
+                    Text(verbatim: "\(model.favorites.items.count)")
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                         .foregroundStyle(pal.secondary)
                 }
@@ -844,13 +844,13 @@ struct NeonMainView: View {
                 .frame(width: 8, height: 8)
                 .neonGlow(statusColor(store.status), radius: 5)
                 .accessibilityHidden(true)
-            Text(model.speakerTitle.uppercased())
+            Text(model.speakerTitle.interfaceUppercased)
                 .font(.system(size: 13, weight: .heavy).width(.expanded))
                 .tracking(1.2)
                 .lineLimit(1)
                 .foregroundStyle(pal.onSky)
                 .layoutPriority(-1)
-            if model.isDemo && !RadioCatalog.fold(model.speakerTitle).contains("demo") {
+            if model.isDemo && !RadioCatalog.fold(model.speakerTitle).contains(RadioCatalog.fold(String(localized: "Démo"))) {
                 Text("DÉMO")
                     .font(.system(size: 9, weight: .heavy, design: .monospaced))
                     .tracking(1)
@@ -863,14 +863,14 @@ struct NeonMainView: View {
                 if wide {
                     NeonSourceChips(store: store, tint: pal.dark ? NeonPalette.cyan : Color(hex: 0x6A1FC0))
                 } else if let label = store.snapshot.modelLabel {
-                    Text(label.uppercased())
+                    Text(label.interfaceUppercased)
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
                         .foregroundStyle(pal.onSkySecondary)
                         .lineLimit(1)
                         .layoutPriority(-2)
                 }
             } else {
-                Text(store.status.label.uppercased())
+                Text(store.status.label.interfaceUppercased)
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .foregroundStyle(pal.onSkySecondary)
                     .lineLimit(1)
@@ -1058,7 +1058,7 @@ struct NeonMiniPlayer: View {
             HStack(spacing: 7) {
                 Circle().fill(statusColor(store.status)).frame(width: 7, height: 7)
                     .neonGlow(statusColor(store.status), radius: 4)
-                Text(model.speakerTitle.uppercased())
+                Text(model.speakerTitle.interfaceUppercased)
                     .font(.system(size: 11, weight: .heavy).width(.expanded))
                     .tracking(0.8)
                     .lineLimit(1)
@@ -1103,7 +1103,7 @@ struct NeonMiniPlayer: View {
                         }
                         .buttonStyle(.plain)
                         .help(station.title)
-                        .accessibilityLabel(station.title + (current ? ", en cours" : ""))
+                        .accessibilityLabel(StationAccessibility.label(station.title, current: current))
                     }
                 }
             }

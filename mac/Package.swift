@@ -13,10 +13,14 @@ let package = Package(
         .library(name: "KEFKit", targets: ["KEFKit"]),
     ],
     targets: [
-        .target(name: "KEFKit"),
+        // Chaînes traduites (fr, en, es, it, ja) : String Catalogs compilés par SwiftPM.
+        .target(name: "KEFKit", resources: [.process("Localizable.xcstrings")]),
         .executableTarget(
             name: "KEFRemote",
-            dependencies: ["KEFKit"]
+            dependencies: ["KEFKit"],
+            // Recopiés dans « KEF Remote.app/Contents/Resources/<langue>.lproj » par build-app.sh
+            // (bundle principal : SwiftUI y cherche les Text("…") et AppKit ses menus standard).
+            resources: [.process("Localizable.xcstrings"), .process("InfoPlist.xcstrings")]
         ),
         .testTarget(
             name: "KEFKitTests",

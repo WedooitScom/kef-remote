@@ -42,17 +42,18 @@ public enum KEFError: LocalizedError, Equatable, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .http(let code, let body): "Erreur HTTP \(code)\(body.isEmpty ? "" : " : \(body.prefix(120))")"
-        case .invalidResponse(let what): "Réponse inattendue de l'enceinte (\(what))"
-        case .notAStation: "Ce n'est pas une station airable"
-        case .stationUnavailable: "Station introuvable ou injouable"
-        case .searchFormMissing: "Formulaire de recherche introuvable"
-        case .noSearchResults: "La recherche n'a pas renvoyé de résultats"
-        case .tooManyRedirects: "Trop de redirections"
-        case .queueExpired: "File d'événements expirée"
-        case .offline: "Enceinte hors ligne"
-        case .notConfigured: "Aucune enceinte configurée"
-        case .invalidHost(let raw): "Adresse invalide : « \(raw) »"
+        case .http(let code, let body):
+            body.isEmpty ? localized("Erreur HTTP \(code)") : localized("Erreur HTTP \(code) : \(String(body.prefix(120)))")
+        case .invalidResponse(let what): localized("Réponse inattendue de l'enceinte (\(what))")
+        case .notAStation: localized("Ce n'est pas une station airable")
+        case .stationUnavailable: localized("Station introuvable ou injouable")
+        case .searchFormMissing: localized("Formulaire de recherche introuvable")
+        case .noSearchResults: localized("La recherche n'a pas renvoyé de résultats")
+        case .tooManyRedirects: localized("Trop de redirections")
+        case .queueExpired: localized("File d'événements expirée")
+        case .offline: localized("Enceinte hors ligne")
+        case .notConfigured: localized("Aucune enceinte configurée")
+        case .invalidHost(let raw): localized("Adresse invalide : « \(raw) »")
         }
     }
 }
@@ -81,17 +82,18 @@ public func describe(_ error: any Error) -> String {
     if let url = error as? URLError {
         if isLocalNetworkDenied(url) { return localNetworkDeniedMessage }
         switch url.code {
-        case .timedOut: return "Délai dépassé"
-        case .cannotConnectToHost, .cannotFindHost: return "Enceinte injoignable"
-        case .notConnectedToInternet, .networkConnectionLost: return "Réseau indisponible"
+        case .timedOut: return localized("Délai dépassé")
+        case .cannotConnectToHost, .cannotFindHost: return localized("Enceinte injoignable")
+        case .notConnectedToInternet, .networkConnectionLost: return localized("Réseau indisponible")
         default: return url.localizedDescription
         }
     }
     return error.localizedDescription
 }
 
-public let localNetworkDeniedMessage =
-    "Accès au réseau local refusé : autorisez KEF Remote dans Réglages Système › Confidentialité et sécurité › Réseau local"
+public var localNetworkDeniedMessage: String {
+    localized("Accès au réseau local refusé : autorisez KEF Remote dans Réglages Système › Confidentialité et sécurité › Réseau local")
+}
 
 /// macOS bloque l'accès au réseau local tant que l'utilisateur n'a pas accepté la demande
 /// (ou l'a refusée) : URLSession échoue alors avec `notConnectedToInternet` et un chemin

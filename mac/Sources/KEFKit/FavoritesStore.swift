@@ -78,7 +78,7 @@ public final class FavoritesStore {
             suggestHistory = decoded.suggestHistory ?? false
         } catch {
             Self.log.warning("favorites.json illisible : \(error.localizedDescription, privacy: .public)")
-            lastError = "Fichier de favoris illisible"
+            lastError = localized("Fichier de favoris illisible")
         }
     }
 
@@ -97,7 +97,7 @@ public final class FavoritesStore {
             lastError = nil
         } catch {
             Self.log.error("Écriture des favoris impossible : \(error.localizedDescription, privacy: .public)")
-            lastError = "Impossible d'enregistrer les favoris"
+            lastError = localized("Impossible d'enregistrer les favoris")
         }
     }
 

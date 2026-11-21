@@ -24,7 +24,7 @@ private struct PanelLabel: View {
     var color: Color = HiFiPalette.secondary
 
     var body: some View {
-        Text(text.uppercased())
+        Text(text.interfaceUppercased)
             .font(.system(size: size, weight: .medium, design: .monospaced))
             .tracking(size * 0.22)
             .foregroundStyle(color)
@@ -157,7 +157,7 @@ struct VolumeKnob: View {
                 .animation(.interactiveSpring(duration: 0.18), value: angle)
             // Valeur au centre.
             VStack(spacing: 0) {
-                Text(snap.isMuted && enabled ? "MUTE" : (enabled ? "\(snap.volume)" : "--"))
+                Text(verbatim: snap.isMuted && enabled ? "MUTE" : (enabled ? "\(snap.volume)" : "--"))
                     .font(.system(size: knob * (snap.isMuted && enabled ? 0.15 : 0.24), weight: .medium, design: .monospaced))
                     .foregroundStyle(enabled ? HiFiPalette.amber : HiFiPalette.tertiary)
                     .contentTransition(.numericText(value: value))
@@ -193,7 +193,7 @@ struct VolumeKnob: View {
         .help("Volume : tournez par le bord, glissez verticalement, molette ou flèches")
         .accessibilityElement()
         .accessibilityLabel("Volume")
-        .accessibilityValue(snap.isMuted ? "Son coupé" : "\(snap.volume) %")
+        .accessibilityValue(snap.isMuted ? Text("Son coupé") : Text(Double(snap.volume) / 100, format: .percent))
         .accessibilityHint("Molette rotative. Balayez vers le haut ou le bas pour régler.")
         .accessibilityAdjustableAction { direction in
             guard enabled else { return }
@@ -329,7 +329,7 @@ private struct HiFiDisplay: View {
                     PanelLED(on: snap.isPlaying)
                     PanelLabel(text: NowPlayingText.kicker(model), size: compact ? 8 : 9, color: HiFiPalette.amber.opacity(0.8))
                 }
-                Text((compact ? NowPlayingText.compactTitle(model) : NowPlayingText.title(model)).uppercased())
+                Text((compact ? NowPlayingText.compactTitle(model) : NowPlayingText.title(model)).interfaceUppercased)
                     .font(.system(size: compact ? 13 : 20, weight: .semibold, design: .monospaced))
                     .tracking(compact ? 0.5 : 1)
                     .foregroundStyle(HiFiPalette.amber)
@@ -508,7 +508,7 @@ private struct HiFiMuteKey: View {
         Button { store.toggleMute() } label: {
             HStack(spacing: 5) {
                 PanelLED(on: snap.isMuted && snap.isOn)
-                Text("MUTE").font(.system(size: 10, weight: .semibold, design: .monospaced)).tracking(1.5)
+                Text(verbatim: "MUTE").font(.system(size: 10, weight: .semibold, design: .monospaced)).tracking(1.5)
             }
             .frame(width: width, height: 26)
         }
@@ -533,11 +533,11 @@ private struct HiFiPresets: View {
             ForEach(items, id: \.element.id) { index, station in
                 let current = model.isCurrent(station)
                 HStack(spacing: compact ? 5 : 8) {
-                    Text("\(index + 1)")
+                    Text(verbatim: "\(index + 1)")
                         .font(.system(size: compact ? 11 : 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(HiFiPalette.amber)
                         .frame(minWidth: compact ? 12 : 18)
-                    Text(station.title.uppercased())
+                    Text(station.title.interfaceUppercased)
                         .font(.system(size: compact ? 9 : 11, weight: .medium, design: .monospaced))
                         .tracking(compact ? 0.3 : 0.8)
                         .foregroundStyle(current ? HiFiPalette.amber : HiFiPalette.text)
@@ -572,7 +572,7 @@ private struct HiFiPresets: View {
                 .favoriteInteractions(station: station, index: index, dropTarget: $dropTarget)
                 .help(station.description ?? station.title)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Préréglage \(index + 1), \(station.title)" + (current ? ", en cours" : ""))
+                .accessibilityLabel(StationAccessibility.label(String(localized: "Préréglage \(index + 1), \(station.title)"), current: current))
                 .accessibilityAddTraits(.isButton)
             }
         }
@@ -650,7 +650,7 @@ struct HiFiMainView: View {
         let store = model.store
         return HStack(spacing: 12) {
             HStack(spacing: 10) {
-                Text("KEF")
+                Text(verbatim: "KEF")
                     .font(.system(size: 15, weight: .heavy, design: .monospaced))
                     .tracking(3)
                     .foregroundStyle(HiFiPalette.text)
@@ -658,7 +658,7 @@ struct HiFiMainView: View {
                     .truncationMode(.tail)
                     .layoutPriority(-1)
                 if model.isDemo {
-                    PanelLabel(text: "Démo", size: 8, color: HiFiPalette.amber)
+                    PanelLabel(text: String(localized: "Démo"), size: 8, color: HiFiPalette.amber)
                         .padding(.horizontal, 5).padding(.vertical, 2)
                         .overlay(RoundedRectangle(cornerRadius: 2).strokeBorder(HiFiPalette.amber.opacity(0.6), lineWidth: 1))
                 }
@@ -666,7 +666,7 @@ struct HiFiMainView: View {
             Spacer()
             HStack(spacing: 6) {
                 PanelLED(on: store.status != .notConfigured, color: ledColor(store.status))
-                PanelLabel(text: store.status.isOnline ? (store.snapshot.modelLabel ?? "Connectée") : store.status.label, size: 9)
+                PanelLabel(text: store.status.isOnline ? (store.snapshot.modelLabel ?? String(localized: "Connectée")) : store.status.label, size: 9)
                 if case .offline = store.status {
                     Button("RÉESSAYER") { store.retryNow() }
                         .buttonStyle(HiFiKeyStyle())
@@ -704,7 +704,7 @@ struct HiFiMiniPlayer: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 PanelLED(on: store.status != .notConfigured, color: ledColor(store.status))
-                Text("KEF").font(.system(size: 12, weight: .heavy, design: .monospaced)).tracking(2.5)
+                Text(verbatim: "KEF").font(.system(size: 12, weight: .heavy, design: .monospaced)).tracking(2.5)
                 PanelLabel(text: model.speakerTitle, size: 9, color: HiFiPalette.text.opacity(0.8))
                 Spacer()
                 OpenMainWindowButton {

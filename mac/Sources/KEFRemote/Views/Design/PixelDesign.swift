@@ -243,7 +243,7 @@ struct PixelTitle: View {
         ViewThatFits(in: .horizontal) {
             PixelText(text: text, scale: 3, color: color)
             PixelText(text: text, scale: 2, color: color)
-            Text(text.uppercased())
+            Text(text.interfaceUppercased)
                 .font(.system(size: 17, weight: .heavy, design: .monospaced))
                 .foregroundStyle(color)
                 .lineLimit(2)
@@ -725,7 +725,7 @@ struct PixelBoombox: View {
             .frame(width: CGFloat(size.w) * k, height: CGFloat(size.h) * k)
             .accessibilityElement()
             .accessibilityLabel("Radio-cassette")
-            .accessibilityValue("\(title), \(subtitle)")
+            .accessibilityValue(Text(verbatim: "\(title), \(subtitle)"))
 
             topKeys(face: face, on: on)
             dial(enabled: on)
@@ -861,7 +861,7 @@ private struct PixelSourceKeys: View {
         let snap = store.snapshot
         HStack(spacing: 6) {
             if showsLabel {
-                PixelText(text: "SOURCE", scale: 2, color: pal.secondary)
+                PixelText(text: String(localized: "SOURCE"), scale: 2, color: pal.secondary)
                     .padding(.trailing, 4)
             }
             ForEach(snap.sources) { source in
@@ -936,7 +936,7 @@ private struct PixelFavoriteRow: View {
             }
             if index < 9 {
                 PixelText(text: "\(index + 1)", scale: 2, color: current ? pal.ink : pal.secondary)
-                    .help("⌘\(index + 1)")
+                    .help(Text(verbatim: "⌘\(index + 1)"))
             }
         }
         .padding(.horizontal, 6)
@@ -958,7 +958,7 @@ private struct PixelFavoriteRow: View {
         .favoriteInteractions(station: station, index: index, dropTarget: $dropTarget)
         .help(station.description ?? station.title)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(station.title + (current ? ", en cours" : ""))
+        .accessibilityLabel(StationAccessibility.label(station.title, current: current))
         .accessibilityAddTraits(.isButton)
         .accessibilityAction(named: "Retirer des favoris") { model.toggleFavorite(station) }
     }
@@ -976,7 +976,7 @@ private struct PixelFavoritesPanel: View {
         let favorite = model.favorites.contains(current)
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                PixelText(text: "FAVORIS", scale: 2, color: pal.text)
+                PixelText(text: String(localized: "FAVORIS"), scale: 2, color: pal.text)
                 if !model.favorites.items.isEmpty {
                     PixelText(text: "\(model.favorites.items.count)", scale: 2, color: pal.secondary)
                 }
@@ -1084,13 +1084,13 @@ struct PixelMainView: View {
             .accessibilityHidden(true)
             ViewThatFits(in: .horizontal) {
                 PixelText(text: model.speakerTitle, scale: 2, color: pal.text)
-                Text(model.speakerTitle.uppercased())
+                Text(model.speakerTitle.interfaceUppercased)
                     .font(.system(size: 13, weight: .heavy, design: .monospaced))
                     .lineLimit(1)
             }
             .layoutPriority(-1)
-            if model.isDemo && !RadioCatalog.fold(model.speakerTitle).contains("demo") {
-                PixelText(text: "DÉMO", scale: 2, color: pal.ink)
+            if model.isDemo && !RadioCatalog.fold(model.speakerTitle).contains(RadioCatalog.fold(String(localized: "Démo"))) {
+                PixelText(text: String(localized: "DÉMO"), scale: 2, color: pal.ink)
                     .padding(.horizontal, 6).padding(.vertical, 3)
                     .pixelPanel(fill: pal.mustard, unit: 2)
             }
@@ -1098,12 +1098,12 @@ struct PixelMainView: View {
             if store.status.isOnline, let label = store.snapshot.modelLabel {
                 PixelText(text: label, scale: 2, color: pal.secondary)
             } else {
-                Text(store.status.label.uppercased())
+                Text(store.status.label.interfaceUppercased)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundStyle(pal.secondary)
             }
             if case .offline = store.status {
-                Button { store.retryNow() } label: { PixelText(text: "RÉESSAYER", scale: 2, color: pal.ink) }
+                Button { store.retryNow() } label: { PixelText(text: String(localized: "RÉESSAYER"), scale: 2, color: pal.ink) }
                     .buttonStyle(.mustard(pal, unit: 2, icon: nil))
             }
             Button { openSettings() } label: { Color.clear }
@@ -1136,7 +1136,7 @@ struct PixelMiniPlayer: View {
                     p.fill(1, 1, 2, 2, statusColor(store.status, pal))
                 }
                 .frame(width: 8, height: 8)
-                Text(model.speakerTitle.uppercased())
+                Text(model.speakerTitle.interfaceUppercased)
                     .font(.system(size: 11, weight: .heavy, design: .monospaced))
                     .lineLimit(1)
                 Spacer(minLength: 4)
@@ -1163,7 +1163,7 @@ struct PixelMiniPlayer: View {
                         }
                         .buttonStyle(.plain)
                         .help(station.title)
-                        .accessibilityLabel(station.title + (current ? ", en cours" : ""))
+                        .accessibilityLabel(StationAccessibility.label(station.title, current: current))
                     }
                 }
             }

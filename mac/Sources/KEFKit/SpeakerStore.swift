@@ -241,7 +241,7 @@ public final class SpeakerStore {
         } catch {
             guard gen == generation else { return false }
             if optimistic != nil { snapshot = before }
-            commandError = "Commande refusée : \(describe(error))"
+            commandError = localized("Commande refusée : \(describe(error))")
             retryNow()
             return false
         }
@@ -288,7 +288,7 @@ public final class SpeakerStore {
                 do {
                     try await client.setVolume(target)
                 } catch {
-                    self.commandError = "Volume : \(describe(error))"
+                    self.commandError = localized("Volume : \(describe(error))")
                     break
                 }
                 try? await Task.sleep(for: .milliseconds(60))
@@ -424,7 +424,7 @@ public final class SpeakerStore {
             } catch {
                 // Après un réveil, le lecteur met un peu de temps à accepter « play ».
                 if attempt == attempts - 1 || gen != generation {
-                    commandError = "Lecture impossible : \(describe(error))"
+                    commandError = localized("Lecture impossible : \(describe(error))")
                     return
                 }
                 try? await Task.sleep(for: Self.playRetryDelay)

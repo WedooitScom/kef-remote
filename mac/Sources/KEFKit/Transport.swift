@@ -96,29 +96,30 @@ public enum TransportLogic {
                                 station: Station?, favorites: [Station], fallback: [Station]) -> SkipPlan {
         let next = direction == .next
         let shortcut = next ? "⌘→" : "⌘←"
-        let trackLabel = next ? "Piste suivante" : "Piste précédente"
+        let trackLabel = next ? localized("Piste suivante") : localized("Piste précédente")
         guard isOnline, snapshot.isOn else {
-            return SkipPlan(action: .none, label: trackLabel, help: "\(trackLabel) (\(shortcut))")
+            return SkipPlan(action: .none, label: trackLabel, help: localized("\(trackLabel) (\(shortcut))"))
         }
         let wifi = snapshot.source == .wifi || snapshot.source == nil
         if wifi, station != nil || snapshot.player.isAirableRadio {
-            let label = next ? "Radio suivante" : "Radio précédente"
+            let label = next ? localized("Radio suivante") : localized("Radio précédente")
             let list = zapList(favorites: favorites, fallback: fallback)
             guard let target = adjacentStation(direction, current: station, in: list) else {
-                let why = list.isEmpty ? "aucune radio favorite ni récente" : "aucune autre radio dans la liste"
-                return SkipPlan(action: .none, isRadio: true, label: label, help: "\(label) : \(why)")
+                let help = list.isEmpty ? localized("\(label) : aucune radio favorite ni récente")
+                    : localized("\(label) : aucune autre radio dans la liste")
+                return SkipPlan(action: .none, isRadio: true, label: label, help: help)
             }
-            let origin = favorites.isEmpty ? " (radios récentes)" : ""
-            return SkipPlan(action: .station(target), isRadio: true, label: label,
-                            help: "\(label) : « \(target.title) »\(origin) (\(shortcut))")
+            let help = favorites.isEmpty ? localized("\(label) : « \(target.title) » (radios récentes) (\(shortcut))")
+                : localized("\(label) : « \(target.title) » (\(shortcut))")
+            return SkipPlan(action: .station(target), isRadio: true, label: label, help: help)
         }
         if snapshot.player.state == .stopped && snapshot.player.title == nil {
-            return SkipPlan(action: .none, label: trackLabel, help: "\(trackLabel) : rien en lecture")
+            return SkipPlan(action: .none, label: trackLabel, help: localized("\(trackLabel) : rien en lecture"))
         }
         let allowed = next ? snapshot.player.canGoNext : snapshot.player.canGoPrevious
         guard allowed else {
-            return SkipPlan(action: .none, label: trackLabel, help: "\(trackLabel) : non disponible pour ce contenu")
+            return SkipPlan(action: .none, label: trackLabel, help: localized("\(trackLabel) : non disponible pour ce contenu"))
         }
-        return SkipPlan(action: .track, label: trackLabel, help: "\(trackLabel) (\(shortcut))")
+        return SkipPlan(action: .track, label: trackLabel, help: localized("\(trackLabel) (\(shortcut))"))
     }
 }

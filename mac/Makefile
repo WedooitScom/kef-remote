@@ -1,5 +1,5 @@
 # Raccourcis pour le client macOS KEF Remote.
-.PHONY: build test app run demo live-test clean
+.PHONY: build test app run demo live-test l10n clean
 
 build:
 	swift build
@@ -20,6 +20,10 @@ demo: app
 # Tests en lecture seule contre une vraie enceinte : make live-test HOST=192.168.1.20
 live-test:
 	KEF_LIVE_HOST=$(HOST) swift test --filter LiveSpeakerTests
+
+# Clés des String Catalogs : manquantes, obsolètes ou non traduites.
+l10n:
+	python3 scripts/l10n.py
 
 clean:
 	rm -rf .build build

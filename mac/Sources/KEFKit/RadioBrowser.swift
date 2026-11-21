@@ -35,27 +35,27 @@ public enum RadioDirectory: String, CaseIterable, Sendable, Hashable, Identifiab
 
     public var title: String {
         switch self {
-        case .countries: "Pays"
-        case .genres: "Genres"
-        case .languages: "Langues"
-        case .popular: "Populaires"
-        case .trending: "Tendance"
-        case .local: "Locales"
-        case .highQuality: "Haute qualité"
-        case .new: "Nouvelles"
+        case .countries: localized("Pays")
+        case .genres: localized("Genres")
+        case .languages: localized("Langues")
+        case .popular: localized("Populaires")
+        case .trending: localized("Tendance")
+        case .local: localized("Locales")
+        case .highQuality: localized("Haute qualité")
+        case .new: localized("Nouvelles")
         }
     }
 
     public var subtitle: String {
         switch self {
-        case .countries: "Par région et par pays"
-        case .genres: "Jazz, rock, classique…"
-        case .languages: "Stations par langue"
-        case .popular: "Les plus écoutées"
-        case .trending: "En ce moment"
-        case .local: "Autour de l'enceinte"
-        case .highQuality: "Haut débit"
-        case .new: "Nouvelles stations"
+        case .countries: localized("Par région et par pays")
+        case .genres: localized("Jazz, rock, classique…")
+        case .languages: localized("Stations par langue")
+        case .popular: localized("Les plus écoutées")
+        case .trending: localized("En ce moment")
+        case .local: localized("Autour de l'enceinte")
+        case .highQuality: localized("Haut débit")
+        case .new: localized("Nouvelles stations")
         }
     }
 
@@ -122,10 +122,38 @@ public enum RadioFacet: String, Sendable, Hashable, CaseIterable {
     /// Libellé court (puce « affiner par… »).
     public var label: String {
         switch self {
-        case .country: "Pays"
-        case .language: "Langue"
-        case .genre: "Genre"
+        case .country: localized("Pays")
+        case .language: localized("Langue")
+        case .genre: localized("Genre")
         }
+    }
+
+    /// Puce d'un raffinement inactif (« Par pays »).
+    public var byLabel: String {
+        switch self {
+        case .country: localized("Par pays")
+        case .language: localized("Par langue")
+        case .genre: localized("Par genre")
+        }
+    }
+
+    /// Aide d'un raffinement inactif (« Affiner par pays »).
+    public var refineHelp: String {
+        switch self {
+        case .country: localized("Affiner par pays")
+        case .language: localized("Affiner par langue")
+        case .genre: localized("Affiner par genre")
+        }
+    }
+
+    /// Raffinement actif (« Langue : français »).
+    public func activeLabel(_ value: String) -> String {
+        localized("\(label) : \(value)")
+    }
+
+    /// Aide d'un raffinement actif (« Langue : français — changer »).
+    public func activeHelp(_ value: String) -> String {
+        localized("\(label) : \(value) — changer")
     }
 
     public var symbol: String {
@@ -295,6 +323,6 @@ extension KEFParser {
 public extension SpeakerClient {
     /// Par défaut (faux clients des tests) : pas d'explorateur.
     func browseRadios(_ location: RadioBrowseLocation, from: Int, count: Int) async throws -> RadioBrowsePage {
-        throw KEFError.invalidResponse("explorateur non disponible")
+        throw KEFError.invalidResponse(localized("explorateur non disponible"))
     }
 }

@@ -86,15 +86,27 @@ struct TransportControls: View {
     }
 }
 
+/// Libellés VoiceOver d'une station (« Radio Cuivre, en cours »).
+enum StationAccessibility {
+    static func label(_ title: String, current: Bool, favorite: Bool = false) -> String {
+        switch (current, favorite) {
+        case (true, true): String(localized: "\(title), en cours, favori")
+        case (true, false): String(localized: "\(title), en cours")
+        case (false, true): String(localized: "\(title), favori")
+        case (false, false): title
+        }
+    }
+}
+
 /// Libellés du bouton lecture / pause (une radio s'arrête puis reprend en direct).
 enum PlayPauseText {
     static func label(_ snap: SpeakerSnapshot) -> String {
-        snap.isPlaying ? (snap.player.isLive ? "Arrêter la radio" : "Pause") : "Lecture"
+        snap.isPlaying ? (snap.player.isLive ? String(localized: "Arrêter la radio") : String(localized: "Pause")) : String(localized: "Lecture")
     }
 
     static func help(_ snap: SpeakerSnapshot) -> String {
-        if snap.isPlaying && snap.player.isLive { return "Arrêter la radio (Espace) : la reprise repart du direct" }
-        return snap.isPlaying ? "Pause (Espace)" : "Lecture (Espace)"
+        if snap.isPlaying && snap.player.isLive { return String(localized: "Arrêter la radio (Espace) : la reprise repart du direct") }
+        return snap.isPlaying ? String(localized: "Pause (Espace)") : String(localized: "Lecture (Espace)")
     }
 }
 
@@ -125,7 +137,7 @@ struct VolumeControl: View {
             .accessibilityLabel("Volume")
 
             if showValue {
-                Text("\(snap.volume)")
+                Text(verbatim: "\(snap.volume)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
                     .frame(width: 24, alignment: .trailing)

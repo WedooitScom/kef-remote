@@ -56,18 +56,18 @@ enum BaladeurScreen: String, Hashable {
 
     var title: String {
         switch self {
-        case .menu: "Menu"
-        case .nowPlaying: "À l'écoute"
-        case .options: "Options"
-        case .favorites: "Radios"
-        case .reorder: "Ordre des radios"
-        case .search: "Recherche"
-        case .sources: "Sources"
-        case .recent: "Récentes"
-        case .explore: "Explorer"
-        case .setup: "Enceintes"
-        case .offline: "Hors ligne"
-        case .standby: "Veille"
+        case .menu: String(localized: "Menu")
+        case .nowPlaying: String(localized: "À l'écoute")
+        case .options: String(localized: "Options")
+        case .favorites: String(localized: "Radios")
+        case .reorder: String(localized: "Ordre des radios")
+        case .search: String(localized: "Recherche")
+        case .sources: String(localized: "Sources")
+        case .recent: String(localized: "Récentes")
+        case .explore: String(localized: "Explorer")
+        case .setup: String(localized: "Enceintes")
+        case .offline: String(localized: "Hors ligne")
+        case .standby: String(localized: "Veille")
         }
     }
 
@@ -339,33 +339,33 @@ struct BaladeurDevice: View {
         switch screen {
         case .menu:
             var rows = [
-                BaladeurRow(id: "now", title: "À l'écoute", trailing: .chevron) { go(.nowPlaying) },
-                BaladeurRow(id: "fav", title: "Radios favorites", trailing: .chevron) { go(.favorites) },
-                BaladeurRow(id: "explore", title: "Explorer", trailing: .chevron) {
+                BaladeurRow(id: "now", title: String(localized: "À l'écoute"), trailing: .chevron) { go(.nowPlaying) },
+                BaladeurRow(id: "fav", title: String(localized: "Radios favorites"), trailing: .chevron) { go(.favorites) },
+                BaladeurRow(id: "explore", title: String(localized: "Explorer"), trailing: .chevron) {
                     model.explorer.popToRoot()
                     model.explorer.loadShelves()
                     go(.explore)
                 },
             ]
             if !compact {
-                rows.append(BaladeurRow(id: "search", title: "Recherche", trailing: .chevron) { go(.search) })
+                rows.append(BaladeurRow(id: "search", title: String(localized: "Recherche"), trailing: .chevron) { go(.search) })
             }
             rows += [
-                BaladeurRow(id: "src", title: "Sources", trailing: .chevron) { go(.sources) },
-                BaladeurRow(id: "recent", title: "Écoutées récemment", trailing: .chevron) { go(.recent) },
+                BaladeurRow(id: "src", title: String(localized: "Sources"), trailing: .chevron) { go(.sources) },
+                BaladeurRow(id: "recent", title: String(localized: "Écoutées récemment"), trailing: .chevron) { go(.recent) },
             ]
             if compact {
-                rows.append(BaladeurRow(id: "open", title: "Ouvrir KEF Remote", trailing: .chevron) {
+                rows.append(BaladeurRow(id: "open", title: String(localized: "Ouvrir KEF Remote"), trailing: .chevron) {
                     NSApp.activate(ignoringOtherApps: true)
                     openWindow(id: "main")
                 })
             }
             rows += [
-                BaladeurRow(id: "settings", title: "Réglages", trailing: .chevron) {
+                BaladeurRow(id: "settings", title: String(localized: "Réglages"), trailing: .chevron) {
                     NSApp.activate(ignoringOtherApps: true)
                     openSettings()
                 },
-                BaladeurRow(id: "sleep", title: "Mettre en veille") { Task { await store.togglePower() } },
+                BaladeurRow(id: "sleep", title: String(localized: "Mettre en veille")) { Task { await store.togglePower() } },
             ]
             return rows
 
@@ -373,17 +373,17 @@ struct BaladeurDevice: View {
             let current = snap.currentStation
             let isFavorite = model.favorites.contains(current)
             return [
-                BaladeurRow(id: "star", title: isFavorite ? "Retirer des favoris" : "Ajouter aux favoris",
+                BaladeurRow(id: "star", title: isFavorite ? String(localized: "Retirer des favoris") : String(localized: "Ajouter aux favoris"),
                             detail: current?.title, trailing: .favorite(isFavorite), enabled: current != nil) {
                     model.toggleCurrentFavorite()
                     nav.pop()
                 },
-                BaladeurRow(id: "mute", title: snap.isMuted ? "Rétablir le son" : "Couper le son") {
+                BaladeurRow(id: "mute", title: snap.isMuted ? String(localized: "Rétablir le son") : String(localized: "Couper le son")) {
                     store.toggleMute()
                     nav.pop()
                 },
-                BaladeurRow(id: "src", title: "Source", detail: snap.source?.label, trailing: .chevron) { go(.sources) },
-                BaladeurRow(id: "sleep", title: "Mettre en veille") { Task { await store.togglePower() } },
+                BaladeurRow(id: "src", title: String(localized: "Source"), detail: snap.source?.label, trailing: .chevron) { go(.sources) },
+                BaladeurRow(id: "sleep", title: String(localized: "Mettre en veille")) { Task { await store.togglePower() } },
             ]
 
         case .favorites:
@@ -394,16 +394,16 @@ struct BaladeurDevice: View {
                 }
             }
             if rows.isEmpty {
-                rows.append(BaladeurRow(id: "empty", title: "Aucune radio favorite", enabled: false) {})
+                rows.append(BaladeurRow(id: "empty", title: String(localized: "Aucune radio favorite"), enabled: false) {})
                 if !model.history.isEmpty {
-                    rows.append(BaladeurRow(id: "recent", title: "Écoutées récemment", trailing: .chevron) { go(.recent) })
+                    rows.append(BaladeurRow(id: "recent", title: String(localized: "Écoutées récemment"), trailing: .chevron) { go(.recent) })
                 }
                 if !compact {
-                    rows.append(BaladeurRow(id: "search", title: "Rechercher une station", trailing: .chevron) { go(.search) })
+                    rows.append(BaladeurRow(id: "search", title: String(localized: "Rechercher une station"), trailing: .chevron) { go(.search) })
                 }
-                rows.append(BaladeurRow(id: "import", title: "Importer…") { model.importFavorites() })
+                rows.append(BaladeurRow(id: "import", title: String(localized: "Importer…")) { model.importFavorites() })
             } else if rows.count > 1 {
-                rows.append(BaladeurRow(id: "reorder", title: "Modifier l'ordre…", trailing: .chevron) { go(.reorder) })
+                rows.append(BaladeurRow(id: "reorder", title: String(localized: "Modifier l'ordre…"), trailing: .chevron) { go(.reorder) })
             }
             return rows
 
@@ -434,9 +434,9 @@ struct BaladeurDevice: View {
             var rows: [BaladeurRow] = []
             let missing = model.history.filter { !model.favorites.contains($0) }
             if !missing.isEmpty {
-                rows.append(BaladeurRow(id: "addall", title: "Tout ajouter aux favoris", detail: "\(missing.count)") {
+                rows.append(BaladeurRow(id: "addall", title: String(localized: "Tout ajouter aux favoris"), detail: "\(missing.count)") {
                     withAnimation { model.history.forEach { model.favorites.add($0) } }
-                    model.showToast("Radios récentes ajoutées aux favoris")
+                    model.showToast(String(localized: "Radios récentes ajoutées aux favoris"))
                 })
             }
             rows += model.history.map { station in
@@ -446,7 +446,7 @@ struct BaladeurDevice: View {
                 }
             }
             if model.history.isEmpty {
-                rows.append(BaladeurRow(id: "none", title: model.historyLoaded ? "Aucune radio récente" : "Chargement…",
+                rows.append(BaladeurRow(id: "none", title: model.historyLoaded ? String(localized: "Aucune radio récente") : String(localized: "Chargement…"),
                                         enabled: false) {})
             }
             return rows
@@ -458,7 +458,7 @@ struct BaladeurDevice: View {
                     if let host = speaker.host { try? model.setHost(host) }
                 }
             }
-            rows.append(BaladeurRow(id: "settings", title: "Réglages…", trailing: .chevron) {
+            rows.append(BaladeurRow(id: "settings", title: String(localized: "Réglages…"), trailing: .chevron) {
                 NSApp.activate(ignoringOtherApps: true)
                 openSettings()
             })
@@ -468,7 +468,7 @@ struct BaladeurDevice: View {
             return exploreRows()
 
         case .offline:
-            return [BaladeurRow(id: "retry", title: "Réessayer", enabled: store.status != .connecting) { store.retryNow() }]
+            return [BaladeurRow(id: "retry", title: String(localized: "Réessayer"), enabled: store.status != .connecting) { store.retryNow() }]
 
         case .nowPlaying, .standby:
             return []
@@ -488,15 +488,15 @@ struct BaladeurDevice: View {
         }
         if case .failed(let message) = page.state {
             return [BaladeurRow(id: "error", title: message, enabled: false) {},
-                    BaladeurRow(id: "retry", title: "Réessayer") { explorer.retry(page) }]
+                    BaladeurRow(id: "retry", title: String(localized: "Réessayer")) { explorer.retry(page) }]
         }
         if page.items.isEmpty && page.refinements.isEmpty {
-            return [BaladeurRow(id: "loading", title: page.isLoading || page.state == .idle ? "Chargement…" : "Aucune station",
+            return [BaladeurRow(id: "loading", title: page.isLoading || page.state == .idle ? String(localized: "Chargement…") : String(localized: "Aucune station"),
                                 enabled: false) {}]
         }
         var rows = page.refinements.map { item in
             let facet = item.facet ?? .genre
-            return BaladeurRow(id: item.id, title: item.activeValue.map { "\(facet.label) : \($0)" } ?? "Affiner : \(facet.label)",
+            return BaladeurRow(id: item.id, title: item.activeValue.map { facet.activeLabel($0) } ?? String(localized: "Affiner : \(facet.label)"),
                                trailing: .chevron) { explorer.open(item) }
         }
         for item in page.items {
@@ -512,16 +512,16 @@ struct BaladeurDevice: View {
             }
         }
         if page.isLoading {
-            rows.append(BaladeurRow(id: "more", title: "Chargement…", enabled: false) {})
+            rows.append(BaladeurRow(id: "more", title: String(localized: "Chargement…"), enabled: false) {})
         } else if page.loadMoreError != nil {
-            rows.append(BaladeurRow(id: "retry", title: "Réessayer") { explorer.retry(page) })
+            rows.append(BaladeurRow(id: "retry", title: String(localized: "Réessayer")) { explorer.retry(page) })
         }
         return rows
     }
 
     /// « 🇫🇷 France », « Tout : Jazz »…
     private func folderTitle(_ item: RadioBrowseItem, style: RadioExplorerStyle) -> String {
-        if item.isAllOf { return "Tout : \(item.displayTitle)" }
+        if item.isAllOf { return String(localized: "Tout : \(item.displayTitle)") }
         if style == .countries, let flag = RadioCatalog.flag(forCountry: item.title) { return "\(flag) \(item.title)" }
         return item.title
     }
@@ -591,6 +591,7 @@ private struct BaladeurScreenView: View {
                  : screen == .explore ? (model.explorer.current?.headerTitle ?? screen.title) : screen.title)
                 .font(titleFont)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .truncationMode(.tail)
             Spacer(minLength: 0)
             HStack(spacing: compact ? 4 : 5) {
@@ -633,21 +634,21 @@ private struct BaladeurScreenView: View {
             VStack(spacing: 0) {
                 searchField
                 if model.searchResults.isEmpty {
-                    message(model.searchError ?? (model.searchText.isEmpty ? "Tapez le nom d'une station" : " "))
+                    message(model.searchError ?? (model.searchText.isEmpty ? String(localized: "Tapez le nom d'une station") : " "))
                 } else {
                     list
                 }
             }
         case .offline:
             VStack(spacing: 0) {
-                message(model.store.status == .connecting ? "Connexion…" : "Enceinte indisponible", bold: true)
+                message(model.store.status == .connecting ? String(localized: "Connexion…") : String(localized: "Enceinte indisponible"), bold: true)
                 Text(model.store.status.label).font(.system(size: compact ? 9 : 11)).foregroundStyle(BaladeurPalette.inkDim)
                     .lineLimit(2).multilineTextAlignment(.center).padding(.horizontal, 8).padding(.bottom, 6)
                 list
             }
         case .setup:
             VStack(spacing: 0) {
-                message(model.discovery.kefSpeakers.isEmpty ? "Recherche des enceintes…" : "Choisissez une enceinte")
+                message(model.discovery.kefSpeakers.isEmpty ? String(localized: "Recherche des enceintes…") : String(localized: "Choisissez une enceinte"))
                 list
             }
         default:
@@ -762,7 +763,7 @@ private struct BaladeurScreenView: View {
         let size: CGFloat = compact ? 9 : 11
         switch row.trailing {
         case .chevron:
-            Text("›").font(.system(size: size + 5, weight: .bold))
+            Text(verbatim: "›").font(.system(size: size + 5, weight: .bold))
         case .check:
             Image(systemName: "checkmark").font(.system(size: size, weight: .bold))
         case .playing:
@@ -934,7 +935,7 @@ private struct BaladeurNowPlaying: View {
         }
         .accessibilityElement()
         .accessibilityLabel("Volume")
-        .accessibilityValue("\(snap.volume) %")
+        .accessibilityValue(Text(Double(snap.volume) / 100, format: .percent))
     }
 
     @ViewBuilder
@@ -959,8 +960,11 @@ private struct BaladeurNowPlaying: View {
                 Text(snap.player.isLive ? "EN DIRECT" : (snap.isPlaying ? "EN LECTURE" : "EN PAUSE"))
                     .font(.system(size: compact ? 9 : 11, weight: .heavy))
                     .tracking(1)
-                Spacer()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Spacer(minLength: 4)
                 Text("VOL \(snap.volume)")
+                    .fixedSize()
                     .font(.system(size: compact ? 9 : 10.5, weight: .bold).monospacedDigit())
                     .foregroundStyle(BaladeurPalette.inkDim)
             }
@@ -981,8 +985,8 @@ private struct ClickWheel: View {
     var onPrevious: () -> Void
     var onNext: () -> Void
     /// Libellés VoiceOver des zones gauche / droite (« Radio précédente » sur une radio).
-    var previousLabel = "Piste précédente"
-    var nextLabel = "Piste suivante"
+    var previousLabel = String(localized: "Piste précédente")
+    var nextLabel = String(localized: "Piste suivante")
     var onSelect: () -> Void
     /// Appui long sur le bouton central (favori).
     var onLongSelect: () -> Void = {}
@@ -1024,7 +1028,7 @@ private struct ClickWheel: View {
                     .animation(.easeOut(duration: 0.12), value: tick)
             }
             // Libellés.
-            Text("MENU").font(.system(size: diameter * 0.075, weight: .bold)).tracking(0.5)
+            Text(verbatim: "MENU").font(.system(size: diameter * 0.075, weight: .bold)).tracking(0.5)
                 .offset(y: -(diameter + inner) / 4 + 1)
             Image(systemName: "playpause.fill").font(.system(size: diameter * 0.075))
                 .offset(y: (diameter + inner) / 4)

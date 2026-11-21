@@ -29,7 +29,7 @@ private struct Kicker: View {
     var size: CGFloat = 10
 
     var body: some View {
-        Text(text.uppercased())
+        Text(text.interfaceUppercased)
             .font(.system(size: size, weight: .semibold))
             .tracking(size * 0.18)
             .foregroundStyle(color)
@@ -99,7 +99,7 @@ private struct SourceLine: View {
         HStack(spacing: size * 0.5) {
             ForEach(Array(snap.sources.enumerated()), id: \.element) { index, source in
                 if index > 0 {
-                    Text("·").foregroundStyle(EditorialPalette.muted).accessibilityHidden(true)
+                    Text(verbatim: "·").foregroundStyle(EditorialPalette.muted).accessibilityHidden(true)
                 }
                 let selected = snap.isOn && snap.source == source
                 Button { Task { await store.selectSource(source) } } label: {
@@ -146,7 +146,7 @@ private struct NumberedFavorites: View {
                             .foregroundStyle(current ? EditorialPalette.orange : EditorialPalette.ink)
                             .lineLimit(1)
                         if current {
-                            Text("●").font(.system(size: titleSize * 0.6)).foregroundStyle(EditorialPalette.orange)
+                            Text(verbatim: "●").font(.system(size: titleSize * 0.6)).foregroundStyle(EditorialPalette.orange)
                                 .accessibilityHidden(true)
                         }
                         Spacer(minLength: 0)
@@ -166,7 +166,7 @@ private struct NumberedFavorites: View {
                 .favoriteInteractions(station: station, index: index, dropTarget: $dropTarget)
                 .help(station.description ?? station.title)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(index + 1), \(station.title)" + (current ? ", en cours" : ""))
+                .accessibilityLabel(StationAccessibility.label("\(index + 1), \(station.title)", current: current))
                 .accessibilityAddTraits(.isButton)
             }
         }
@@ -184,7 +184,7 @@ private struct EditorialVolume: View {
         let enabled = store.status.isOnline && snap.isOn
         HStack(alignment: .center, spacing: 16) {
             Button { store.toggleMute() } label: {
-                Kicker(text: snap.isMuted ? "Muet" : "Volume", color: snap.isMuted ? EditorialPalette.orange : EditorialPalette.muted)
+                Kicker(text: snap.isMuted ? String(localized: "Muet") : String(localized: "Volume"), color: snap.isMuted ? EditorialPalette.orange : EditorialPalette.muted)
                     .frame(width: 62, alignment: .leading)
             }
             .buttonStyle(.plain)
@@ -192,7 +192,7 @@ private struct EditorialVolume: View {
             .help(snap.isMuted ? "Rétablir le son (⌥⌘↓)" : "Couper le son (⌥⌘↓)")
             .accessibilityLabel(snap.isMuted ? "Rétablir le son" : "Couper le son")
             ThinVolumeSlider(store: store, track: EditorialPalette.rule, fill: EditorialPalette.ink, thickness: 1, knob: 9)
-            Text("\(snap.volume)")
+            Text(verbatim: "\(snap.volume)")
                 .font(.system(size: numberSize, weight: .bold).monospacedDigit())
                 .tracking(-1.5)
                 .foregroundStyle(enabled ? EditorialPalette.ink : EditorialPalette.rule)
@@ -257,7 +257,7 @@ struct EditorialMainView: View {
 
     private var sourceBar: some View {
         HStack(spacing: 20) {
-            Kicker(text: "Source")
+            Kicker(text: String(localized: "Source"))
             SourceLine(store: model.store)
             Spacer(minLength: 0)
         }
@@ -268,17 +268,17 @@ struct EditorialMainView: View {
     private var header: some View {
         let store = model.store
         return HStack(spacing: 14) {
-            Text("KEF REMOTE").font(.system(size: 12, weight: .heavy)).tracking(2.5)
+            Text(verbatim: "KEF REMOTE").font(.system(size: 12, weight: .heavy)).tracking(2.5)
             Rule(vertical: true).frame(height: 16)
             Text(model.speakerTitle).font(.system(size: 13, weight: .medium)).lineLimit(1)
                 .layoutPriority(-1)
             if model.isDemo {
-                Kicker(text: "Démo", color: EditorialPalette.orange, size: 9)
+                Kicker(text: String(localized: "Démo"), color: EditorialPalette.orange, size: 9)
             }
             Spacer()
             HStack(spacing: 6) {
                 StatusDot(status: store.status)
-                Kicker(text: store.status.isOnline ? (store.snapshot.modelLabel ?? "Connectée") : store.status.label)
+                Kicker(text: store.status.isOnline ? (store.snapshot.modelLabel ?? String(localized: "Connectée")) : store.status.label)
                 if case .offline = store.status {
                     Button("Réessayer") { store.retryNow() }.buttonStyle(.link).font(.caption)
                 }
@@ -372,7 +372,7 @@ struct EditorialMainView: View {
                         .frame(maxHeight: .infinity)
                     }
                     .frame(width: 220, height: 3)
-                    Text("\(formatTime(position)) / \(formatTime(duration))")
+                    Text(verbatim: "\(formatTime(position)) / \(formatTime(duration))")
                         .font(.system(size: 11, weight: .medium).monospacedDigit())
                         .foregroundStyle(EditorialPalette.muted)
                 }
@@ -432,7 +432,7 @@ struct EditorialMiniPlayer: View {
         let store = model.store
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Text("KEF REMOTE").font(.system(size: 10, weight: .heavy)).tracking(2)
+                Text(verbatim: "KEF REMOTE").font(.system(size: 10, weight: .heavy)).tracking(2)
                 StatusDot(status: store.status)
                 Text(model.speakerTitle).font(.system(size: 11, weight: .medium)).foregroundStyle(EditorialPalette.muted).lineLimit(1)
                 Spacer()

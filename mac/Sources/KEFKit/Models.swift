@@ -14,9 +14,9 @@ public enum SpeakerSource: String, CaseIterable, Sendable, Codable, Identifiable
         case .wifi: "Wi‑Fi"
         case .bluetooth: "Bluetooth"
         case .tv: "TV"
-        case .optic: "Optique"
-        case .coaxial: "Coaxial"
-        case .analog: "Analogique"
+        case .optic: localized("Optique")
+        case .coaxial: localized("Coaxial")
+        case .analog: localized("Analogique")
         case .usb: "USB"
         }
     }

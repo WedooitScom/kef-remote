@@ -18,15 +18,15 @@ public actor DemoSpeakerClient: SpeakerClient {
     ]
 
     static let stations: [DemoStation] = [
-        DemoStation(n: 1, title: "Radio Cuivre", desc: "Jazz et soul, en direct de Maidstone", hue: 24, now: "Brass Tweeter Blues"),
-        DemoStation(n: 2, title: "Onde Coaxiale FM", desc: "Pop indé et nouveautés", hue: 200, now: "Concentric Hearts"),
-        DemoStation(n: 3, title: "Basse Fréquence", desc: "Électro, house et deep", hue: 280, now: "Port Resonance (Extended)"),
-        DemoStation(n: 4, title: "Classique Uni-Q", desc: "Musique classique 24h/24", hue: 45, now: "Nocturne pour enceinte seule"),
-        DemoStation(n: 5, title: "Kent Info", desc: "Actualités et débats", hue: 0, now: "Le journal de 18 h"),
-        DemoStation(n: 6, title: "Métamatériau Rock", desc: "Rock et métal", hue: 150, now: "Absorb the Noise"),
-        DemoStation(n: 7, title: "Veille Lounge", desc: "Chill-out, lounge et ambient", hue: 320, now: "Standby Lullaby (Radio Edit)"),
-        DemoStation(n: 8, title: "Radio Cuivre Groove", desc: "Funk et groove", hue: 30, now: "Copper Funk Machine"),
-        DemoStation(n: 9, title: "Ondes Monde", desc: "Musiques du monde", hue: 100, now: "Wireless Two Step"),
+        DemoStation(n: 1, title: "Radio Cuivre", desc: localized("Jazz et soul, en direct de Maidstone"), hue: 24, now: "Brass Tweeter Blues"),
+        DemoStation(n: 2, title: "Onde Coaxiale FM", desc: localized("Pop indé et nouveautés"), hue: 200, now: "Concentric Hearts"),
+        DemoStation(n: 3, title: "Basse Fréquence", desc: localized("Électro, house et deep"), hue: 280, now: "Port Resonance (Extended)"),
+        DemoStation(n: 4, title: "Classique Uni-Q", desc: localized("Musique classique 24h/24"), hue: 45, now: "Nocturne pour enceinte seule"),
+        DemoStation(n: 5, title: "Kent Info", desc: localized("Actualités et débats"), hue: 0, now: "Le journal de 18 h"),
+        DemoStation(n: 6, title: "Métamatériau Rock", desc: localized("Rock et métal"), hue: 150, now: "Absorb the Noise"),
+        DemoStation(n: 7, title: "Veille Lounge", desc: localized("Chill-out, lounge et ambient"), hue: 320, now: "Standby Lullaby (Radio Edit)"),
+        DemoStation(n: 8, title: "Radio Cuivre Groove", desc: localized("Funk et groove"), hue: 30, now: "Copper Funk Machine"),
+        DemoStation(n: 9, title: "Ondes Monde", desc: localized("Musiques du monde"), hue: 100, now: "Wireless Two Step"),
     ]
 
     /// `controls` relevé sur une radio airable : ni pause, ni précédent / suivant.
@@ -44,7 +44,7 @@ public actor DemoSpeakerClient: SpeakerClient {
     }
 
     // État simulé
-    private var name = "Salon (démo)"
+    private var name = localized("Salon (démo)")
     private var power: PowerState = .on
     private var source: SpeakerSource = .wifi
     private var lastSource: SpeakerSource = .wifi

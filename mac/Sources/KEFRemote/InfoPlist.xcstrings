@@ -1,0 +1,74 @@
+{
+  "sourceLanguage" : "fr",
+  "strings" : {
+    "NSHumanReadableCopyright" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unofficial client for KEF speakers."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliente no oficial para altavoces KEF."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Client non officiel pour enceintes KEF."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Client non ufficiale per diffusori KEF."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEFスピーカー用の非公式クライアント。"
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEF Remote connects to your KEF speakers on the local network to show what is playing and control them (volume, sources, radios)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEF Remote se conecta a tus altavoces KEF en la red local para mostrar lo que se está reproduciendo y controlarlos (volumen, fuentes, radios)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEF Remote se connecte à vos enceintes KEF sur le réseau local pour afficher la lecture en cours et les piloter (volume, sources, radios)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEF Remote si connette ai tuoi diffusori KEF sulla rete locale per mostrare cosa è in riproduzione e controllarli (volume, sorgenti, radio)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KEF Remoteはローカルネットワーク上のKEFスピーカーに接続し、再生中の内容を表示して操作します（音量、ソース、ラジオ）。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

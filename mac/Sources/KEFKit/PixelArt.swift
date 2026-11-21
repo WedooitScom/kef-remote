@@ -1,4 +1,5 @@
 import CoreGraphics
+import CoreText
 import Foundation
 
 // Design « Rétro pixel » : tout ce qui se teste sans interface — police bitmap, icônes,
@@ -47,16 +48,21 @@ public struct PixelRect: Equatable, Hashable, Sendable {
 
 // MARK: - Police bitmap 5×7
 
-/// Glyphe bitmap : `rows[r]` décrit la ligne `r` (bit de poids fort = colonne 0).
+/// Glyphe bitmap : `rows[r]` décrit la ligne `r` (bit `width - 1` = colonne 0).
 /// Cellule de `PixelFont.cellHeight` lignes : 2 pour les accents, 7 pour les capitales,
-/// 1 de jambage (cédille, virgule).
+/// 1 de jambage (cédille, virgule) ; un glyphe japonais occupe les 10 lignes.
 public struct PixelGlyph: Equatable, Sendable {
     public let width: Int
-    public let rows: [UInt8]
+    public let rows: [UInt16]
 
     public func isOn(x: Int, y: Int) -> Bool {
         guard x >= 0, x < width, rows.indices.contains(y) else { return false }
-        return rows[y] & (1 << UInt8(width - 1 - x)) != 0
+        return rows[y] & (1 << UInt16(width - 1 - x)) != 0
+    }
+
+    init(width: Int, rows: [UInt16]) {
+        self.width = width
+        self.rows = rows
     }
 
     /// Nombre de pixels allumés (tests : un glyphe visible n'est pas vide).
@@ -65,14 +71,14 @@ public struct PixelGlyph: Equatable, Sendable {
     /// Construit un glyphe à partir de lignes « #.#.. » (capitales) et d'éventuels accents.
     init(cap: [String], accent: [String] = [], descender: String? = nil) {
         let width = cap.map(\.count).max() ?? 0
-        func bits(_ line: String) -> UInt8 {
-            var value: UInt8 = 0
+        func bits(_ line: String) -> UInt16 {
+            var value: UInt16 = 0
             for (i, ch) in line.enumerated() where ch == "#" && i < width {
-                value |= 1 << UInt8(width - 1 - i)
+                value |= 1 << UInt16(width - 1 - i)
             }
             return value
         }
-        var rows = [UInt8](repeating: 0, count: PixelFont.cellHeight)
+        var rows = [UInt16](repeating: 0, count: PixelFont.cellHeight)
         let top = PixelFont.capTop - accent.count
         for (i, line) in accent.enumerated() { rows[top + i] = bits(line) }
         for (i, line) in cap.prefix(PixelFont.capHeight).enumerated() { rows[PixelFont.capTop + i] = bits(line) }
@@ -82,9 +88,11 @@ public struct PixelGlyph: Equatable, Sendable {
     }
 }
 
-/// Police bitmap 5×7 dessinée en code : capitales, chiffres, ponctuation courante et
-/// accents du français. Les minuscules s'affichent en capitales ; un caractère inconnu
-/// est d'abord ramené à sa lettre de base (Ñ → N), sinon remplacé par un damier.
+/// Police bitmap 5×7 dessinée en code : capitales, chiffres, ponctuation courante, accents
+/// du français, de l'espagnol et de l'italien (Ñ, ¿, ¡…). Les minuscules s'affichent en
+/// capitales ; un caractère inconnu est d'abord ramené à sa lettre de base (Å → A). Les
+/// écritures d'Asie de l'Est (kana, kanji, hangul) sont rendues par la police système,
+/// rastérisée sur la grille 10 × 10 des pixels logiques ; le reste devient un damier.
 public enum PixelFont {
     /// Lignes réservées aux accents au-dessus des capitales.
     public static let capTop = 2
@@ -102,7 +110,13 @@ public enum PixelFont {
         let folded = String(character).folding(options: [.diacriticInsensitive], locale: Locale(identifier: "fr_FR"))
             .uppercased()
         if folded.count == 1, let base = folded.first, let g = table[base] { return g }
+        if let g = SystemGlyphs.shared.glyph(for: character) { return g }
         return fallback
+    }
+
+    /// Le caractère est-il dessiné avec la police système (japonais…) ?
+    public static func usesSystemFont(_ character: Character) -> Bool {
+        table[character] == nil && SystemGlyphs.isEastAsian(character)
     }
 
     /// Le caractère a-t-il un glyphe dédié (sans repli) ?
@@ -110,7 +124,14 @@ public enum PixelFont {
 
     /// Texte tel qu'il sera dessiné (capitales, « ß » → « SS »…).
     public static func normalize(_ text: String) -> String {
-        text.uppercased(with: Locale(identifier: "fr_FR"))
+        // Formes pleine chasse (« ： », « （ ») ramenées à l'ASCII, dessiné en bitmap.
+        let halfWidth = String(text.map { ch -> String in
+            guard let v = ch.unicodeScalars.first?.value, ch.unicodeScalars.count == 1, (0xFF01...0xFF5E).contains(v) else {
+                return String(ch)
+            }
+            return String(ch).precomposedStringWithCompatibilityMapping
+        }.joined())
+        return halfWidth.uppercased(with: Locale(identifier: "fr_FR"))
             .replacingOccurrences(of: "\u{2019}", with: "'")
             .replacingOccurrences(of: "\u{2026}", with: "…")
     }
@@ -151,6 +172,7 @@ public enum PixelFont {
 
     private static let accents: [String: [String]] = [
         "aigu": ["...#.", "..#.."],
+        "tilde": [".##.#", "#..#."],
         "grave": [".#...", "..#.."],
         "circ": ["..#..", ".#.#."],
         "trema": [".#.#.", "....."],
@@ -233,6 +255,12 @@ public enum PixelFont {
         "⏻": ["..#..", "#.#.#", "#.#.#", "#...#", "#...#", "#...#", ".###."],
         "★": ["..#..", "..#..", "#####", ".###.", ".###.", "##.##", "#...#"],
         "♪": ["..##.", "..#.#", "..#..", "..#..", ".##..", "###..", ".#..."],
+        "¿": ["..#..", ".....", "..#..", ".#...", "#....", "#...#", ".###."],
+        "¡": ["#", ".", "#", "#", "#", "#", "#"],
+        "–": [".....", ".....", ".....", "#####", ".....", ".....", "....."],
+        "—": ["......", "......", "......", "######", "......", "......", "......"],
+        "‹": ["...", "..#", ".#.", "#..", ".#.", "..#", "..."],
+        "›": ["...", "#..", ".#.", "..#", ".#.", "#..", "..."],
     ]
 
     /// Lettres accentuées : lettre de base + accent (au-dessus) ou cédille (dessous).
@@ -242,7 +270,7 @@ public enum PixelFont {
         "Î": ("I", "circ3"), "Ï": ("I", "trema3"), "Í": ("I", "aigu3"), "Ì": ("I", "grave3"),
         "Ô": ("O", "circ"), "Ö": ("O", "trema"), "Ó": ("O", "aigu"), "Ò": ("O", "grave"),
         "Ù": ("U", "grave"), "Û": ("U", "circ"), "Ü": ("U", "trema"), "Ú": ("U", "aigu"),
-        "Ÿ": ("Y", "trema"),
+        "Ÿ": ("Y", "trema"), "Ñ": ("N", "tilde"), "Ã": ("A", "tilde"), "Õ": ("O", "tilde"),
     ]
 
     private static let table: [Character: PixelGlyph] = {
@@ -257,6 +285,70 @@ public enum PixelFont {
         t[";"] = PixelGlyph(cap: ["..", "..", ".#", "..", "..", ".#", ".#"], descender: "#.")
         return t
     }()
+}
+
+// MARK: - Glyphes de la police système
+
+/// Glyphes rastérisés à la volée (Hiragino Sans), mis en cache : un caractère japonais
+/// (ou chinois, coréen) dessiné sur 10 × 10 pixels logiques, encre seuillée à 1 bit.
+final class SystemGlyphs: @unchecked Sendable {
+    static let shared = SystemGlyphs()
+    static let side = PixelFont.cellHeight
+
+    private let lock = NSLock()
+    private var cache: [Character: PixelGlyph?] = [:]
+    private let font = CTFontCreateWithName("HiraginoSans-W4" as CFString, CGFloat(PixelFont.cellHeight), nil)
+
+    /// Kana, kanji, hangul, ponctuation et symboles CJK.
+    static func isEastAsian(_ character: Character) -> Bool {
+        guard let v = character.unicodeScalars.first?.value else { return false }
+        return (0x3000...0x30FF).contains(v) || (0x31F0...0x31FF).contains(v) || (0x3400...0x4DBF).contains(v)
+            || (0x4E00...0x9FFF).contains(v) || (0xAC00...0xD7AF).contains(v) || (0xF900...0xFAFF).contains(v)
+            || (0xFF65...0xFF9F).contains(v)
+    }
+
+    func glyph(for character: Character) -> PixelGlyph? {
+        guard Self.isEastAsian(character) else { return nil }
+        lock.lock()
+        defer { lock.unlock() }
+        if let cached = cache[character] { return cached }
+        let glyph = rasterize(character)
+        cache[character] = glyph
+        return glyph
+    }
+
+    private func rasterize(_ character: Character) -> PixelGlyph? {
+        let side = Self.side
+        guard let ctx = CGContext(data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: side,
+                                  space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)
+        else { return nil }
+        ctx.setFillColor(gray: 0, alpha: 1)
+        ctx.fill(CGRect(x: 0, y: 0, width: side, height: side))
+        let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key(kCTFontAttributeName as String): font,
+                          NSAttributedString.Key(kCTForegroundColorAttributeName as String): CGColor(gray: 1, alpha: 1)]
+        let line = CTLineCreateWithAttributedString(NSAttributedString(string: String(character), attributes: attributes))
+        let bounds = CTLineGetBoundsWithOptions(line, [])
+        let ascent = CTFontGetAscent(font), descent = CTFontGetDescent(font)
+        ctx.setAllowsFontSmoothing(false)
+        ctx.textPosition = CGPoint(x: ((CGFloat(side) - bounds.width) / 2 - bounds.minX).rounded(),
+                                   y: ((CGFloat(side) - ascent - descent) / 2 + descent).rounded())
+        CTLineDraw(line, ctx)
+        guard let data = ctx.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
+        // Encre seuillée ; colonnes vides des bords retirées (chasse proportionnelle).
+        var ink = [[Bool]](repeating: [Bool](repeating: false, count: side), count: side)
+        for row in 0..<side {
+            for col in 0..<side { ink[row][col] = data[row * side + col] >= 100 }
+        }
+        let columns = (0..<side).filter { col in ink.contains { $0[col] } }
+        guard let first = columns.first, let last = columns.last else { return nil }
+        let width = max(3, last - first + 1)
+        let rows = ink.map { line -> UInt16 in
+            var value: UInt16 = 0
+            for col in first...last where line[col] { value |= 1 << UInt16(width - 1 - (col - first)) }
+            return value
+        }
+        return PixelGlyph(width: width, rows: rows)
+    }
 }
 
 // MARK: - Icônes

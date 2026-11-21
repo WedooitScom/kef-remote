@@ -15,29 +15,29 @@ enum NowPlayingText {
     /// Titre principal (fenêtre).
     static func title(_ model: AppModel) -> String {
         let store = model.store, s = store.snapshot
-        guard store.status.isOnline else { return store.status == .notConfigured ? "Bienvenue" : "Enceinte indisponible" }
-        if !s.isOn { return "En veille" }
+        guard store.status.isOnline else { return store.status == .notConfigured ? String(localized: "Bienvenue") : String(localized: "Enceinte indisponible") }
+        if !s.isOn { return String(localized: "En veille") }
         if let source = s.source, source != .wifi { return source.label }
-        return s.player.title ?? s.player.station?.title ?? "Rien en lecture"
+        return s.player.title ?? s.player.station?.title ?? String(localized: "Rien en lecture")
     }
 
     /// Sous-titre (fenêtre).
     static func subtitle(_ model: AppModel) -> String {
         let store = model.store, s = store.snapshot
         guard store.status.isOnline else { return store.status.label }
-        if !s.isOn { return "Touchez ⏻ ou une radio pour allumer" }
-        if let source = s.source, source != .wifi { return "Entrée \(source.label.lowercased())" }
+        if !s.isOn { return String(localized: "Touchez ⏻ ou une radio pour allumer") }
+        if let source = s.source, source != .wifi { return String(localized: "Entrée : \(source.label)") }
         if let station = s.player.station, s.player.title != station.title { return station.title }
-        return s.player.artist ?? (s.player.state == .stopped ? "Choisissez une radio" : " ")
+        return s.player.artist ?? (s.player.state == .stopped ? String(localized: "Choisissez une radio") : " ")
     }
 
     /// Titre court (mini-lecteur).
     static func compactTitle(_ model: AppModel) -> String {
         let store = model.store, s = store.snapshot
-        guard store.status.isOnline else { return "Hors ligne" }
-        if !s.isOn { return "En veille" }
+        guard store.status.isOnline else { return String(localized: "Hors ligne") }
+        if !s.isOn { return String(localized: "En veille") }
         if let source = s.source, source != .wifi { return source.label }
-        return s.player.title ?? s.player.station?.title ?? "Rien en lecture"
+        return s.player.title ?? s.player.station?.title ?? String(localized: "Rien en lecture")
     }
 
     /// Sous-titre court (mini-lecteur).
@@ -53,18 +53,18 @@ enum NowPlayingText {
     static func kicker(_ model: AppModel) -> String {
         let store = model.store, s = store.snapshot
         switch store.status {
-        case .notConfigured: return "AUCUNE ENCEINTE"
-        case .connecting: return "CONNEXION…"
-        case .offline: return "HORS LIGNE"
+        case .notConfigured: return String(localized: "AUCUNE ENCEINTE")
+        case .connecting: return String(localized: "CONNEXION…")
+        case .offline: return String(localized: "HORS LIGNE")
         case .online: break
         }
-        if !s.isOn { return "VEILLE" }
+        if !s.isOn { return String(localized: "VEILLE") }
         let source = (s.source ?? .wifi).panelLabel
-        if let src = s.source, src != .wifi { return "ENTRÉE · \(source)" }
+        if let src = s.source, src != .wifi { return String(localized: "ENTRÉE · \(source)") }
         switch s.player.state {
-        case .playing: return (s.player.isLive ? "EN DIRECT" : "EN LECTURE") + " · \(source)"
-        case .paused: return "EN PAUSE · \(source)"
-        case .stopped: return "ARRÊT · \(source)"
+        case .playing: return s.player.isLive ? String(localized: "EN DIRECT · \(source)") : String(localized: "EN LECTURE · \(source)")
+        case .paused: return String(localized: "EN PAUSE · \(source)")
+        case .stopped: return String(localized: "ARRÊT · \(source)")
         }
     }
 
@@ -433,7 +433,7 @@ struct ThinVolumeSlider: View {
         .opacity(enabled ? 1 : 0.4)
         .accessibilityElement()
         .accessibilityLabel("Volume")
-        .accessibilityValue("\(snap.volume) %")
+        .accessibilityValue(Text(Double(snap.volume) / 100, format: .percent))
         .accessibilityAdjustableAction { direction in
             guard enabled else { return }
             switch direction {

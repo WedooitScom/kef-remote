@@ -158,7 +158,7 @@ public final class RadioExplorerModel {
 
     public static let pageSize = 50
     /// Libellé d'une liste « Tout de » dans le fil d'Ariane.
-    public static let allStationsTitle = "Toutes les stations"
+    public static var allStationsTitle: String { localized("Toutes les stations") }
 
     public private(set) var stack: [RadioExplorerPage] = []
     /// Aperçus de l'accueil (étagères), réutilisés à l'ouverture de l'étagère.
@@ -200,7 +200,7 @@ public final class RadioExplorerModel {
             // Sous-genres d'un genre, pays d'une région… ; une liste « Tout de » est une liste de stations.
             style = item.isAllOf ? .stations : (current?.style ?? .stations)
         }
-        var title = item.facet.map { facet in item.activeValue.map { "\(facet.label) : \($0)" } ?? facet.label }
+        var title = item.facet.map { facet in item.activeValue.map { facet.activeLabel($0) } ?? facet.label }
             ?? item.displayTitle
         // « Genres › Jazz › Jazz » : la liste « Tout de: Jazz » ouverte depuis « Jazz » se
         // nomme « Toutes les stations » dans le fil d'Ariane (le dossier reste en en-tête).

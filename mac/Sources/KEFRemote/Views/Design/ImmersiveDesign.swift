@@ -269,7 +269,7 @@ private struct ImmersiveVolume: View {
             .help(snap.isMuted ? "Rétablir le son" : "Couper le son")
             .accessibilityLabel(snap.isMuted ? "Rétablir le son" : "Couper le son")
             ThinVolumeSlider(store: store, track: .white.opacity(0.22), fill: .white, thickness: 2, knob: knob)
-            Text("\(snap.volume)").font(.caption.monospacedDigit()).frame(width: 24, alignment: .trailing)
+            Text(verbatim: "\(snap.volume)").font(.caption.monospacedDigit()).frame(width: 24, alignment: .trailing)
                 .foregroundStyle(.white.opacity(0.7))
         }
         .foregroundStyle(.white.opacity(0.85))
@@ -394,7 +394,7 @@ private struct StationChip: View {
         .contentShape(Capsule())
         .help(station.description ?? station.title)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(station.title + (current ? ", en cours" : ""))
+        .accessibilityLabel(StationAccessibility.label(station.title, current: current))
         .accessibilityAddTraits(.isButton)
     }
 }
@@ -529,7 +529,7 @@ struct ImmersiveMainView: View {
                 }
                 HStack(spacing: 5) {
                     StatusDot(status: store.status)
-                    Text(store.status.isOnline ? (store.snapshot.modelLabel ?? "Connectée") : store.status.label)
+                    Text(store.status.isOnline ? (store.snapshot.modelLabel ?? String(localized: "Connectée")) : store.status.label)
                         .font(.caption2).foregroundStyle(.white.opacity(0.65)).lineLimit(1)
                 }
             }
@@ -608,7 +608,7 @@ struct ImmersiveMainView: View {
         case .offline, .connecting:
             statusScreen(symbol: store.status == .connecting ? "antenna.radiowaves.left.and.right" : "wifi.exclamationmark",
                          title: NowPlayingText.title(model), subtitle: store.status.label,
-                         action: store.status == .connecting ? nil : ("Réessayer", { store.retryNow() }))
+                         action: store.status == .connecting ? nil : (String(localized: "Réessayer"), { store.retryNow() }))
         case .online:
             if store.snapshot.isOn {
                 nowPlaying.transition(.opacity.combined(with: .scale(scale: 0.97)))
@@ -849,7 +849,7 @@ struct ImmersiveMiniPlayer: View {
                 .padding(.vertical, 18)
                 VStack(spacing: 2) {
                     Text(NowPlayingText.compactTitle(model)).font(.title3.weight(.heavy))
-                    Text(store.status.isOnline ? "Touchez ⏻ ou une radio" : store.status.label)
+                    Text(store.status.isOnline ? String(localized: "Touchez ⏻ ou une radio") : store.status.label)
                         .font(.callout).foregroundStyle(.white.opacity(0.72)).lineLimit(2)
                 }
                 .multilineTextAlignment(.center)

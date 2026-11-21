@@ -77,11 +77,11 @@ public final class SpeakerDiscovery {
             }
             browser.stateUpdateHandler = { [weak self] state in
                 if case .failed(let err) = state {
-                    let message = "Découverte impossible : \(err.localizedDescription)"
+                    let message = localized("Découverte impossible : \(err.localizedDescription)")
                     Task { @MainActor in self?.error = message }
                 } else if case .waiting(let err) = state {
                     // Typiquement : autorisation « réseau local » refusée ou en attente.
-                    let message = "Découverte en attente : \(err.localizedDescription)"
+                    let message = localized("Découverte en attente : \(err.localizedDescription)")
                     Task { @MainActor in self?.error = message }
                 }
             }

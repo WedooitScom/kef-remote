@@ -92,7 +92,7 @@ struct StationLogo: View {
     }
 
     private func initials(_ title: String) -> String {
-        title.split(separator: " ").prefix(2).compactMap(\.first).map(String.init).joined().uppercased()
+        title.split(separator: " ").prefix(2).compactMap(\.first).map(String.init).joined().interfaceUppercased
     }
 }
 
@@ -104,7 +104,7 @@ struct CoverArtwork: View {
     var body: some View {
         ZStack {
             if !snapshot.isOn {
-                placeholder(symbol: "power", caption: "En veille")
+                placeholder(symbol: "power", caption: String(localized: "En veille"))
             } else if let source = snapshot.source, source != .wifi {
                 placeholder(symbol: source.symbol, caption: source.label)
             } else if let cover = snapshot.player.coverURL ?? snapshot.player.station?.icon {
@@ -234,10 +234,10 @@ struct StatusDot: View {
 extension ConnectionStatus {
     var label: String {
         switch self {
-        case .online: "Connectée"
-        case .connecting: "Connexion…"
-        case .offline(let why): "Hors ligne · \(why)"
-        case .notConfigured: "Aucune enceinte configurée"
+        case .online: String(localized: "Connectée")
+        case .connecting: String(localized: "Connexion…")
+        case .offline(let why): String(localized: "Hors ligne · \(why)")
+        case .notConfigured: String(localized: "Aucune enceinte configurée")
         }
     }
 }

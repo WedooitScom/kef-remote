@@ -37,6 +37,16 @@ cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp "$ICNS" "$APP/Contents/Resources/AppIcon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
+# Traductions. Celles de l'app vont dans le bundle principal (<langue>.lproj) : SwiftUI y
+# cherche les Text("…") et AppKit en déduit la langue de ses menus standard. Celles de
+# KEFKit restent dans leur bundle de ressources SwiftPM, trouvé par Bundle.module dans
+# Contents/Resources.
+for lproj in "$BIN_DIR/${EXEC_NAME}_${EXEC_NAME}.bundle/Contents/Resources/"*.lproj; do
+  cp -R "$lproj" "$APP/Contents/Resources/"
+done
+mkdir -p "$APP/Contents/Resources/fr.lproj"   # langue de développement (clés = texte français)
+cp -R "$BIN_DIR/${EXEC_NAME}_KEFKit.bundle" "$APP/Contents/Resources/"
+
 # Numéro de build : date, pour distinguer les versions successives.
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(date +%Y%m%d%H%M)" "$APP/Contents/Info.plist"
 plutil -lint "$APP/Contents/Info.plist" >/dev/null

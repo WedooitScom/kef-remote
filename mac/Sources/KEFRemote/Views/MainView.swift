@@ -225,7 +225,7 @@ struct SpeakerHeader: View {
     private var subtitle: String {
         let store = model.store
         guard store.status.isOnline else { return store.status.label }
-        let parts = [store.snapshot.modelLabel, store.snapshot.isOn ? nil : "en veille", model.isDemo ? nil : model.host]
+        let parts = [store.snapshot.modelLabel, store.snapshot.isOn ? nil : String(localized: "en veille"), model.isDemo ? nil : model.host]
         return parts.compactMap { $0 }.joined(separator: " · ")
     }
 }
@@ -243,7 +243,7 @@ struct SetupCard: View {
             if model.discovery.kefSpeakers.isEmpty {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text(model.discovery.error ?? "Recherche en cours…").font(.callout).foregroundStyle(.secondary)
+                    Text(model.discovery.error ?? String(localized: "Recherche en cours…")).font(.callout).foregroundStyle(.secondary)
                 }
             }
             ForEach(model.discovery.kefSpeakers) { speaker in
@@ -251,7 +251,7 @@ struct SetupCard: View {
                     Image(systemName: "hifispeaker.fill").foregroundStyle(Color.kefAccent)
                     VStack(alignment: .leading) {
                         Text(speaker.name).font(.body.weight(.medium))
-                        Text([speaker.model, speaker.host].compactMap { $0 }.joined(separator: " · "))
+                        Text(verbatim: [speaker.model, speaker.host].compactMap { $0 }.joined(separator: " · "))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()

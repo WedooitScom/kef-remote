@@ -227,7 +227,7 @@ struct RadioExplorerView: View {
         .animation(.easeInOut(duration: 0.22), value: explorer.stack.map(\.id))
         .background {
             // Échap : liste précédente, puis fermeture.
-            Button("") { back() }
+            Button(action: back) { EmptyView() }
                 .keyboardShortcut(.cancelAction)
                 .opacity(0)
                 .accessibilityHidden(true)
@@ -279,7 +279,7 @@ private struct ExplorerHeader: View {
         let stack = explorer.stack
         let shown: [RadioExplorerPage?] = stack.count > 3 ? [stack[0], nil] + stack.suffix(2) : stack
         return HStack(spacing: 5) {
-            crumb("Radios", current: stack.isEmpty) { explorer.popToRoot() }
+            crumb(String(localized: "Radios"), current: stack.isEmpty) { explorer.popToRoot() }
                 .layoutPriority(stack.isEmpty ? 1 : 0)
             ForEach(Array(shown.enumerated()), id: \.offset) { _, page in
                 Image(systemName: "chevron.compact.right").font(.system(size: 10, weight: .bold))
@@ -288,7 +288,7 @@ private struct ExplorerHeader: View {
                     crumb(page.title, current: page === explorer.current) { explorer.pop(to: page) }
                         .layoutPriority(page === explorer.current ? 1 : 0)
                 } else {
-                    Text("…").foregroundStyle(skin.secondary)
+                    Text(verbatim: "…").foregroundStyle(skin.secondary)
                 }
             }
         }
@@ -298,7 +298,7 @@ private struct ExplorerHeader: View {
 
     private func crumb(_ title: String, current: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(skin.design == .hifi ? title.uppercased() : title)
+            Text(skin.design == .hifi ? title.interfaceUppercased : title)
                 .fontWeight(current ? .bold : .medium)
                 .foregroundStyle(current ? skin.text : skin.secondary)
                 .truncationMode(.tail)
@@ -320,9 +320,9 @@ private struct ExplorerHome: View {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 4) {
                     if skin.isPixel {
-                        PixelTitle(text: "Explorer les radios", color: skin.text)
+                        PixelTitle(text: String(localized: "Explorer les radios"), color: skin.text)
                     } else if skin.isNeon {
-                        ChromeText(text: "Explorer les radios", size: 30, alignment: .leading)
+                        ChromeText(text: String(localized: "Explorer les radios"), size: 30, alignment: .leading)
                             .padding(.leading, -4)
                     } else {
                         Text("Explorer les radios").font(skin.titleFont(24))
@@ -345,7 +345,7 @@ private struct ExplorerHome: View {
                     ShelfStrip(directory: directory, skin: skin)
                 }
                 VStack(alignment: .leading, spacing: 10) {
-                    SectionLabel(text: "Plus d'étagères", skin: skin)
+                    SectionLabel(text: String(localized: "Plus d'étagères"), skin: skin)
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 10)], spacing: 10) {
                         ForEach(RadioDirectory.shelves.filter { $0 != .popular && $0 != .trending }) { directory in
                             Button { explorer.open(directory) } label: {
@@ -373,7 +373,7 @@ private struct SectionLabel: View {
             if skin.isPixel {
                 PixelText(text: text, scale: 2, color: skin.secondary)
             } else {
-                Text(text.uppercased()).font(skin.sectionFont()).tracking(1.2).foregroundStyle(skin.secondary)
+                Text(text.interfaceUppercased).font(skin.sectionFont()).tracking(1.2).foregroundStyle(skin.secondary)
             }
             Spacer(minLength: 8)
             if let trailing {
@@ -408,7 +408,7 @@ private struct EntryTile: View {
                     .padding(.trailing, height * 0.12)
             }
             VStack(alignment: .leading, spacing: 1) {
-                Text(skin.design == .hifi || skin.isPixel ? title.uppercased() : title)
+                Text(skin.design == .hifi || skin.isPixel ? title.interfaceUppercased : title)
                     .font(.system(size: height > 90 ? 18 : 14, weight: skin.isPixel ? .heavy : .bold, design: skin.fontDesign))
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -467,7 +467,7 @@ private struct ShelfCard: View {
                         .fill(skin.tileGradient(Synthwave.pair(forKey: directory.title)))
                 }
             VStack(alignment: .leading, spacing: 0) {
-                Text(skin.design == .hifi ? directory.title.uppercased() : directory.title)
+                Text(skin.design == .hifi ? directory.title.interfaceUppercased : directory.title)
                     .font(.system(size: 13, weight: .semibold, design: skin.fontDesign)).lineLimit(1)
                 Text(directory.subtitle).font(.caption).foregroundStyle(skin.secondary).lineLimit(1)
             }
@@ -573,7 +573,7 @@ private struct StationCard: View {
         .help(station.description ?? station.title)
         .contextMenu { StationContextMenu(station: station) }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(station.title + (favorite ? ", favori" : ""))
+        .accessibilityLabel(StationAccessibility.label(station.title, current: false, favorite: favorite))
         .accessibilityAddTraits(.isButton)
         .accessibilityAction(named: favorite ? "Retirer des favoris" : "Ajouter aux favoris") { model.toggleFavorite(station) }
     }
@@ -653,7 +653,7 @@ private struct ExplorerPageView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         case .failed(let message):
-            placeholder(symbol: "wifi.exclamationmark", title: "Liste indisponible", message: message) {
+            placeholder(symbol: "wifi.exclamationmark", title: String(localized: "Liste indisponible"), message: message) {
                 Button("Réessayer") { model.explorer.retry(page) }
                     .keyboardShortcut(.defaultAction)
             }
@@ -691,7 +691,7 @@ private struct ExplorerPageView: View {
                     }
                 }
                 if !stations.isEmpty && !folders.isEmpty {
-                    SectionLabel(text: "Stations", skin: skin).padding(.bottom, 6)
+                    SectionLabel(text: String(localized: "Stations"), skin: skin).padding(.bottom, 6)
                 }
                 ForEach(stations) { item in
                     if let station = item.station {
@@ -718,7 +718,7 @@ private struct ExplorerPageView: View {
                 ChromeText(text: page.headerTitle, size: 28, alignment: .leading)
                     .padding(.leading, -4)
             } else {
-                Text(skin.design == .hifi ? page.headerTitle.uppercased() : page.headerTitle)
+                Text(skin.design == .hifi ? page.headerTitle.interfaceUppercased : page.headerTitle)
                     .font(skin.titleFont(24))
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
@@ -738,8 +738,8 @@ private struct ExplorerPageView: View {
             parts.append(t.replacingOccurrences(of: ": ", with: " : "))
         }
         if let n = page.announcedCount, n > 0 {
-            let noun = page.stations.isEmpty && !page.folders.isEmpty ? "entrée" : "station"
-            parts.append("\(n.formatted()) \(noun)\(n > 1 ? "s" : "")")
+            parts.append(page.stations.isEmpty && !page.folders.isEmpty ? String(localized: "\(n) entrées")
+                                                                         : String(localized: "\(n) stations"))
         }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
@@ -759,13 +759,13 @@ private struct ExplorerPageView: View {
                 }
             } else if isEmpty {
                 if page.filterText.isEmpty {
-                    placeholder(symbol: "dot.radiowaves.left.and.right", title: "Aucune station",
-                                message: "Cette liste est vide pour le moment.") { EmptyView() }
+                    placeholder(symbol: "dot.radiowaves.left.and.right", title: String(localized: "Aucune station"),
+                                message: String(localized: "Cette liste est vide pour le moment.")) { EmptyView() }
                         .frame(height: 220)
                 } else {
-                    placeholder(symbol: "magnifyingglass", title: "Aucun résultat",
-                                message: page.hasMore ? "Rien parmi les stations chargées. Faites défiler ou effacez le filtre."
-                                                      : "Aucune entrée ne contient « \(page.filterText) ».") {
+                    placeholder(symbol: "magnifyingglass", title: String(localized: "Aucun résultat"),
+                                message: page.hasMore ? String(localized: "Rien parmi les stations chargées. Faites défiler ou effacez le filtre.")
+                                                      : String(localized: "Aucune entrée ne contient « \(page.filterText) ».")) {
                         if page.hasMore {
                             Button("Charger plus de stations") { model.explorer.loadMore(page) }
                         }
@@ -823,7 +823,7 @@ private struct RefinementChips: View {
         return Button { model.explorer.open(item) } label: {
             HStack(spacing: 5) {
                 Image(systemName: facet.symbol).font(.system(size: 11, weight: .semibold))
-                Text(active.map { "\(facet.label) : \($0)" } ?? "Par \(facet.label.lowercased())")
+                Text(active.map { facet.activeLabel($0) } ?? facet.byLabel)
                     .lineLimit(1)
                 Image(systemName: "chevron.down").font(.system(size: 8, weight: .bold)).opacity(0.6)
             }
@@ -836,7 +836,7 @@ private struct RefinementChips: View {
             .contentShape(shape)
         }
         .buttonStyle(.plain)
-        .help(active.map { "Filtre \(facet.label.lowercased()) : \($0) — changer" } ?? "Affiner par \(facet.label.lowercased())")
+        .help(active.map { facet.activeHelp($0) } ?? facet.refineHelp)
     }
 }
 
@@ -851,14 +851,14 @@ private struct GenreGrid: View {
             ForEach(folders) { item in
                 let style = RadioCatalog.genreStyle(for: item.displayTitle)
                 Button { model.explorer.open(item) } label: {
-                    EntryTile(title: item.isAllOf ? "Tout \(item.displayTitle)" : item.title,
-                              subtitle: item.isAllOf ? "Toutes les stations" : nil,
+                    EntryTile(title: item.isAllOf ? String(localized: "Tout \(item.displayTitle)") : item.title,
+                              subtitle: item.isAllOf ? RadioExplorerModel.allStationsTitle : nil,
                               symbol: item.isAllOf ? "square.grid.2x2.fill" : style.symbol,
                               pair: Synthwave.genrePair(for: item.displayTitle),
                               scene: item.isAllOf ? Synthwave.scene(forKey: item.displayTitle) : nil, skin: skin)
                 }
                 .buttonStyle(TilePressStyle())
-                .accessibilityLabel(item.isAllOf ? "Toutes les stations \(item.displayTitle)" : item.title)
+                .accessibilityLabel(item.isAllOf ? String(localized: "Toutes les stations \(item.displayTitle)") : item.title)
             }
         }
     }
@@ -876,7 +876,7 @@ private struct FolderRow: View {
         Button { model.explorer.open(item) } label: {
             HStack(spacing: 12) {
                 icon.frame(width: 32, height: 32)
-                Text(item.isAllOf ? "Toutes les stations · \(item.displayTitle)" : item.title)
+                Text(item.isAllOf ? String(localized: "Toutes les stations · \(item.displayTitle)") : item.title)
                     .font(.system(size: 14, weight: item.isAllOf ? .semibold : skin.rowWeight, design: skin.fontDesign))
                     .lineLimit(1)
                 Spacer(minLength: 6)

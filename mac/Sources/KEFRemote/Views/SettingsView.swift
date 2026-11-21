@@ -9,6 +9,8 @@ struct SettingsView: View {
     @State private var probeResult: String?
     @State private var probeOK = false
     @State private var probing = false
+    @State private var language = AppLanguage.stored
+    @State private var languageChanged = false
 
     var body: some View {
         Form {
@@ -21,13 +23,38 @@ struct SettingsView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
 
+            Section {
+                Picker("Langue", selection: $language) {
+                    ForEach(AppLanguage.allCases) { Text(verbatim: $0.label).tag($0) }
+                }
+                .onChange(of: language) { _, newValue in
+                    AppLanguage.store(newValue)
+                    languageChanged = true
+                }
+                if languageChanged && language.effectiveLanguage != KEFLocalization.language {
+                    HStack {
+                        Label("La nouvelle langue s'appliquera au prochain lancement.", systemImage: "globe")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        if AppLanguage.canRelaunch {
+                            Button("Relancer maintenant") { AppLanguage.relaunch() }
+                        }
+                    }
+                }
+            } header: {
+                Text("Langue")
+            } footer: {
+                Text("« Système » suit la langue du Mac (Réglages Système › Général › Langue et région).")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
             Section("Enceinte") {
                 if model.isDemo {
                     Label("Mode démo actif : l'enceinte est simulée (lancé avec --demo ou KEF_DEMO=1).", systemImage: "theatermasks")
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    TextField("Adresse IP", text: $hostInput, prompt: Text("192.168.1.20"))
+                    TextField("Adresse IP", text: $hostInput, prompt: Text(verbatim: "192.168.1.20"))
                         .onSubmit(save)
                     Button("Tester", action: probe).disabled(hostInput.isEmpty || probing)
                     Button("Connecter", action: save).keyboardShortcut(.defaultAction).disabled(hostInput.isEmpty)
@@ -53,7 +80,7 @@ struct SettingsView: View {
                 if model.discovery.speakers.filter(\.isKEF).isEmpty {
                     HStack(spacing: 8) {
                         if model.discovery.isBrowsing { ProgressView().controlSize(.small) }
-                        Text(model.discovery.error ?? (model.discovery.isBrowsing ? "Recherche des enceintes KEF…" : "Aucune recherche en cours"))
+                        Text(model.discovery.error ?? (model.discovery.isBrowsing ? String(localized: "Recherche des enceintes KEF…") : String(localized: "Aucune recherche en cours")))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -62,7 +89,7 @@ struct SettingsView: View {
                         Image(systemName: "hifispeaker.fill").foregroundStyle(Color.kefAccent)
                         VStack(alignment: .leading) {
                             Text(speaker.name)
-                            Text([speaker.model, speaker.host ?? "résolution…"].compactMap { $0 }.joined(separator: " · "))
+                            Text(verbatim: [speaker.model, speaker.host ?? String(localized: "résolution…")].compactMap { $0 }.joined(separator: " · "))
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -134,7 +161,7 @@ struct SettingsView: View {
                 probeResult = "\(result.name) — \(model ?? result.release)"
             } catch {
                 probeOK = false
-                probeResult = "Pas de réponse KEF : \(describe(error))"
+                probeResult = String(localized: "Pas de réponse KEF : \(describe(error))")
             }
         }
     }

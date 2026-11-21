@@ -8,8 +8,14 @@ struct KEFRemoteApp: App {
     @State private var model = AppModel()
     @AppStorage(AppDesign.storageKey) private var designRaw = AppDesign.defaultDesign.rawValue
 
+    init() {
+        // `--language <code>` (captures) : avant toute chaîne traduite.
+        // (`model` est créé plus tard : @State évalue sa valeur initiale à la demande.)
+        AppLanguage.applyLaunchOverride()
+    }
+
     var body: some Scene {
-        Window("KEF Remote", id: "main") {
+        Window(Text(verbatim: "KEF Remote"), id: "main") {
             MainRoot()
                 .environment(model)
         }
