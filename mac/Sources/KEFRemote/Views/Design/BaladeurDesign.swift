@@ -51,7 +51,7 @@ enum BaladeurPalette {
 /// Écrans du baladeur. Les quatre derniers dépendent de l'état de l'enceinte et ne sont
 /// jamais empilés.
 enum BaladeurScreen: String, Hashable {
-    case menu, nowPlaying, options, favorites, reorder, search, sources, recent
+    case menu, nowPlaying, options, favorites, reorder, search, sources, recent, explore
     case setup, offline, standby
 
     var title: String {
@@ -64,6 +64,7 @@ enum BaladeurScreen: String, Hashable {
         case .search: "Recherche"
         case .sources: "Sources"
         case .recent: "Récentes"
+        case .explore: "Explorer"
         case .setup: "Enceintes"
         case .offline: "Hors ligne"
         case .standby: "Veille"
@@ -79,7 +80,10 @@ enum BaladeurScreen: String, Hashable {
 @MainActor @Observable
 final class BaladeurNavigator {
     private(set) var stack: [BaladeurScreen] = [.menu, .nowPlaying]
-    private var selections: [BaladeurScreen: Int] = [:]
+    /// Sélection par écran ; pour « Explorer », par liste de l'explorateur.
+    private var selections: [String: Int] = [:]
+    /// Explorateur partagé avec l'app (pile de listes propre à l'écran « Explorer »).
+    @ObservationIgnored weak var explorer: RadioExplorerModel?
     private(set) var showsVolume = false
     var grabbed: String?
     @ObservationIgnored private var volumeTask: Task<Void, Never>?
@@ -101,10 +105,15 @@ final class BaladeurNavigator {
         stack = screen == .menu ? [.menu] : [.menu, screen]
     }
 
-    func selection(_ screen: BaladeurScreen) -> Int { selections[screen] ?? 0 }
+    private func key(_ screen: BaladeurScreen) -> String {
+        guard screen == .explore else { return screen.rawValue }
+        return "explore:" + (explorer?.current?.id.uuidString ?? "accueil")
+    }
+
+    func selection(_ screen: BaladeurScreen) -> Int { selections[key(screen)] ?? 0 }
 
     func select(_ index: Int, in screen: BaladeurScreen, count: Int) {
-        selections[screen] = count > 0 ? min(max(0, index), count - 1) : 0
+        selections[key(screen)] = count > 0 ? min(max(0, index), count - 1) : 0
     }
 
     func flashVolume() {
@@ -171,7 +180,8 @@ struct BaladeurDevice: View {
                        onNext: { model.skip(.next) },
                        previousLabel: model.skipPlan(.previous).label,
                        nextLabel: model.skipPlan(.next).label,
-                       onSelect: { activate(rows, at: nav.selection(screen), in: screen) })
+                       onSelect: { activate(rows, at: nav.selection(screen), in: screen) },
+                       onLongSelect: { longSelect(rows, in: screen) })
             Spacer(minLength: 0)
         }
         .frame(width: width, height: height)
@@ -199,7 +209,15 @@ struct BaladeurDevice: View {
             }
             return .handled
         }
-        .onAppear { if !compact { focused = true } }
+        .onKeyPress("f") {
+            // « F » : même chose que l'appui long sur le bouton central (favori).
+            longSelect(rows, in: screen)
+            return .handled
+        }
+        .onAppear {
+            nav.explorer = model.explorer
+            if !compact { focused = true }
+        }
         .onReceive(NotificationCenter.default.publisher(for: BaladeurScreen.showNotification)) { note in
             guard !compact, let raw = note.object as? String, let target = BaladeurScreen(rawValue: raw) else { return }
             nav.reset(to: target)
@@ -257,11 +275,35 @@ struct BaladeurDevice: View {
             }
         }
         nav.select(new, in: screen, count: rows.count)
+        // Explorateur : page suivante quand on approche du bas de la liste.
+        if screen == .explore, new >= rows.count - 4, let page = model.explorer.current, page.hasMore {
+            model.explorer.loadMore(page)
+        }
+    }
+
+    /// Appui long sur le bouton central : ajouter / retirer des favoris la station
+    /// sélectionnée (ou la radio en cours sur « À l'écoute »), avec un bref message.
+    private func longSelect(_ rows: [BaladeurRow], in screen: BaladeurScreen) {
+        switch screen {
+        case .nowPlaying, .options:
+            guard model.store.snapshot.currentStation != nil else { NSSound.beep(); return }
+            model.toggleCurrentFavorite()
+        case .setup, .offline, .standby, .reorder:
+            return
+        default:
+            let index = nav.selection(screen)
+            guard rows.indices.contains(index), let station = rows[index].station else { NSSound.beep(); return }
+            model.toggleFavorite(station)
+        }
+        NSHapticFeedbackManager.defaultPerformer.perform(.levelChange, performanceTime: .now)
     }
 
     private func menu(_ screen: BaladeurScreen) {
         switch screen {
         case .setup, .offline, .standby: return
+        case .explore where !model.explorer.isHome:
+            // Explorateur : MENU remonte d'abord dans les listes.
+            withAnimation(.easeOut(duration: 0.18)) { model.explorer.pop() }
         default: withAnimation(.easeOut(duration: 0.18)) { nav.pop() }
         }
         if !compact { focused = true }
@@ -299,6 +341,11 @@ struct BaladeurDevice: View {
             var rows = [
                 BaladeurRow(id: "now", title: "À l'écoute", trailing: .chevron) { go(.nowPlaying) },
                 BaladeurRow(id: "fav", title: "Radios favorites", trailing: .chevron) { go(.favorites) },
+                BaladeurRow(id: "explore", title: "Explorer", trailing: .chevron) {
+                    model.explorer.popToRoot()
+                    model.explorer.loadShelves()
+                    go(.explore)
+                },
             ]
             if !compact {
                 rows.append(BaladeurRow(id: "search", title: "Recherche", trailing: .chevron) { go(.search) })
@@ -417,12 +464,66 @@ struct BaladeurDevice: View {
             })
             return rows
 
+        case .explore:
+            return exploreRows()
+
         case .offline:
             return [BaladeurRow(id: "retry", title: "Réessayer", enabled: store.status != .connecting) { store.retryNow() }]
 
         case .nowPlaying, .standby:
             return []
         }
+    }
+
+    /// Menus de l'explorateur : accueil (filtres, étagères), puis listes empilées.
+    private func exploreRows() -> [BaladeurRow] {
+        let explorer = model.explorer
+        guard let page = explorer.current else {
+            return RadioDirectory.filters.map { directory in
+                BaladeurRow(id: directory.id, title: directory.title, trailing: .chevron) { explorer.open(directory) }
+            } + RadioDirectory.shelves.map { directory in
+                BaladeurRow(id: directory.id, title: directory.title, detail: compact ? nil : directory.subtitle,
+                            trailing: .chevron) { explorer.open(directory) }
+            }
+        }
+        if case .failed(let message) = page.state {
+            return [BaladeurRow(id: "error", title: message, enabled: false) {},
+                    BaladeurRow(id: "retry", title: "Réessayer") { explorer.retry(page) }]
+        }
+        if page.items.isEmpty && page.refinements.isEmpty {
+            return [BaladeurRow(id: "loading", title: page.isLoading || page.state == .idle ? "Chargement…" : "Aucune station",
+                                enabled: false) {}]
+        }
+        var rows = page.refinements.map { item in
+            let facet = item.facet ?? .genre
+            return BaladeurRow(id: item.id, title: item.activeValue.map { "\(facet.label) : \($0)" } ?? "Affiner : \(facet.label)",
+                               trailing: .chevron) { explorer.open(item) }
+        }
+        for item in page.items {
+            if let station = item.station {
+                rows.append(BaladeurRow(id: item.id, title: station.title, station: station,
+                                        trailing: model.isCurrent(station) ? .playing : .favorite(model.favorites.contains(station))) {
+                    playAndShow(station)
+                })
+            } else {
+                rows.append(BaladeurRow(id: item.id, title: folderTitle(item, style: page.style), trailing: .chevron) {
+                    explorer.open(item)
+                })
+            }
+        }
+        if page.isLoading {
+            rows.append(BaladeurRow(id: "more", title: "Chargement…", enabled: false) {})
+        } else if page.loadMoreError != nil {
+            rows.append(BaladeurRow(id: "retry", title: "Réessayer") { explorer.retry(page) })
+        }
+        return rows
+    }
+
+    /// « 🇫🇷 France », « Tout : Jazz »…
+    private func folderTitle(_ item: RadioBrowseItem, style: RadioExplorerStyle) -> String {
+        if item.isAllOf { return "Tout : \(item.displayTitle)" }
+        if style == .countries, let flag = RadioCatalog.flag(forCountry: item.title) { return "\(flag) \(item.title)" }
+        return item.title
     }
 }
 
@@ -486,7 +587,8 @@ private struct BaladeurScreenView: View {
                 .frame(width: side, alignment: .leading)
                 .accessibilityHidden(true)
             Spacer(minLength: 0)
-            Text(screen == .menu || screen == .nowPlaying ? model.speakerTitle : screen.title)
+            Text(screen == .menu || screen == .nowPlaying ? model.speakerTitle
+                 : screen == .explore ? (model.explorer.current?.headerTitle ?? screen.title) : screen.title)
                 .font(titleFont)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -882,8 +984,12 @@ private struct ClickWheel: View {
     var previousLabel = "Piste précédente"
     var nextLabel = "Piste suivante"
     var onSelect: () -> Void
+    /// Appui long sur le bouton central (favori).
+    var onLongSelect: () -> Void = {}
 
     @State private var lastAngle: Double?
+    /// Le relâchement qui suit un appui long ne sélectionne pas.
+    @State private var longPressed = false
     @State private var accumulated = 0.0
     @State private var travel: CGFloat = 0
     @State private var rotated = false
@@ -932,7 +1038,9 @@ private struct ClickWheel: View {
         .contentShape(Circle())
         .gesture(dragGesture)
         .overlay {
-            Button(action: onSelect) {
+            Button {
+                if longPressed { longPressed = false } else { onSelect() }
+            } label: {
                 Circle().fill(BaladeurPalette.body(dark))
                     .overlay(Circle().strokeBorder(.black.opacity(dark ? 0.4 : 0.12), lineWidth: 0.75))
                     .shadow(color: .black.opacity(dark ? 0.4 : 0.15), radius: 2, y: 1)
@@ -940,7 +1048,11 @@ private struct ClickWheel: View {
                     .contentShape(Circle())
             }
             .buttonStyle(WheelCenterStyle())
-            .help("Sélectionner")
+            .simultaneousGesture(LongPressGesture(minimumDuration: 0.6).onEnded { _ in
+                longPressed = true
+                onLongSelect()
+            })
+            .help("Sélectionner (appui long : ajouter aux favoris / retirer)")
             .accessibilityLabel("Bouton central, sélectionner")
         }
         .accessibilityElement(children: .contain)
@@ -958,6 +1070,7 @@ private struct ClickWheel: View {
                 Button(previousLabel, action: onPrevious)
                 Button(nextLabel, action: onNext)
                 Button("Bouton central, sélectionner", action: onSelect)
+                Button("Ajouter aux favoris ou retirer", action: onLongSelect)
             }
         }
     }

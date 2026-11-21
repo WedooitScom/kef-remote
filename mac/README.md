@@ -11,8 +11,8 @@ passer par le client web Python du dossier parent.
   radio en cours, recherche avec anti-rebond, suggestions depuis l'historique
   radio de l'enceinte, réordonnancement par glisser-déposer, menu contextuel).
 - Mini-lecteur dans la barre des menus.
-- Cinq designs au choix (Classique, Hi-Fi analogique, Pochette immersive,
-  Éditorial, Baladeur), cf. [Designs](#designs).
+- Sept designs au choix (Classique, Hi-Fi analogique, Pochette immersive,
+  Éditorial, Baladeur, Rétro pixel, Néon 80), cf. [Designs](#designs).
 - « À l'écoute » (Centre de contrôle) et touches média du clavier.
 - Découverte Bonjour des enceintes + saisie manuelle de l'IP.
 - Mode démo sans enceinte.
@@ -65,13 +65,15 @@ capture, les favoris viennent d'un fichier temporaire (garni de stations fictive
 en démo), jamais de `favorites.json` ; en démo, une radio est mise en lecture.
 
 - `--design <nom>` : affiche ce design pour la session, sans le mémoriser
-  (`classique`, `hifi`, `immersif`, `editorial`, `baladeur`). Avec `--snapshot`, produit
-  `main-<nom>.png` et `menubar-<nom>.png` ; `--design all` capture les cinq.
+  (`classique`, `hifi`, `immersif`, `editorial`, `baladeur`, `pixel`, `neon`). Avec `--snapshot`, produit
+  `main-<nom>.png` et `menubar-<nom>.png` ; `--design all` capture les sept.
 - `--snapshot-size 900x560,620x900,min` : capture en plus chaque design à ces tailles
   de fenêtre (`main-<nom>-900x560.png` ; `min` = taille minimale du design).
 - `--appearance dark|light` : impose l'apparence (vérifier le mode sombre).
 - `--snapshot-extras` (démo) : ajoute la taille minimale (`-min`), la veille
-  (`-veille`), `menus.txt` (structure des menus) et `reglages.png`.
+  (`-veille`), l'explorateur (`-explorer`, `-explorer-genres`, `-explorer-stations`…),
+  `menus.txt` (structure des menus), `reglages.png` et `artwork.png` (planche des
+  pochettes de repli de chaque style).
 
 ```sh
 "build/KEF Remote.app/Contents/MacOS/KEFRemote" --demo --design all \
@@ -111,7 +113,7 @@ faites clic droit › Ouvrir.
 | ⌘1 … ⌘9 | Radios favorites 1 à 9 |
 | ⌘D | Ajouter / retirer la radio en cours des favoris |
 | ⇧⌘P | Allumer / mettre en veille |
-| ⌃⌘1 … ⌃⌘5 | Design Classique / Hi-Fi / Immersif / Éditorial / Baladeur |
+| ⌃⌘1 … ⌃⌘7 | Design Classique / Hi-Fi / Immersif / Éditorial / Baladeur / Rétro pixel / Néon 80 |
 | ⌘, | Réglages (design, adresse, découverte, favoris) |
 
 Fermer la fenêtre ne quitte pas l'app : le mini-lecteur reste dans la barre des
@@ -140,12 +142,12 @@ menus (« Quitter » s'y trouve).
 ## Designs
 
 Choix dans **Réglages (⌘,) › Design** (vignettes d'aperçu cliquables), dans le
-menu **Présentation › Design** (⌃⌘1 à ⌃⌘5), par l'icône **palette** en haut à
+menu **Présentation › Design** (⌃⌘1 à ⌃⌘7), par l'icône **palette** en haut à
 droite de la fenêtre (dans la barre de titre, coche sur le design affiché) ou par la
 rangée de vignettes en bas du mini-lecteur. Le changement est immédiat, avec un
 fondu, et s'applique à la fenêtre principale comme au mini-lecteur. La préférence
 est mémorisée (UserDefaults, clé `appDesign` : `classique`, `hifi`, `immersif`,
-`editorial`, `baladeur`). Toutes les fonctions restent disponibles dans chaque design :
+`editorial`, `baladeur`, `pixel`, `neon`). Toutes les fonctions restent disponibles dans chaque design :
 commandes et raccourcis, favoris (lecture d'un clic, glisser-déposer, menu
 contextuel, étoile), recherche, suggestions, sources, marche/veille.
 
@@ -156,13 +158,17 @@ contextuel, étoile), recherche, suggestions, sources, marche/veille.
 | **Pochette immersive** | Toujours sombre, une seule colonne centrée. La pochette (ou le logo de la station), très floutée, couvre toute la fenêtre, voilée de sa couleur dominante (Core Image `CIAreaAverage`, assombrie pour un contraste ≥ 7:1 avec le texte blanc) en dégradé vers le bas ; fondu enchaîné à chaque changement. Au centre : pochette nette, très grand titre, grand bouton lecture blanc, volume en filet. Barre supérieure translucide (enceinte, sources en petites icônes, recherche, réglages, marche), favoris en pastilles défilant horizontalement en bas (étoile et menu ⋯ aux extrémités ; suggestions de l'historique avec « Tout ajouter » s'il n'y a aucun favori). Recherche dans un panneau (loupe ou ⌘F, Échap pour fermer). En veille ou sans pochette : fond ambiant animé lentement (dégradé maillé sous macOS 15+, dégradés radiaux sous macOS 14, figé si « Réduire les animations ») dans les teintes du dernier visuel connu, sinon du premier favori, avec un grand bouton marche ; les pastilles restent disponibles (un clic allume et lance la radio). |
 | **Éditorial** | Fond papier chaud (sombre cohérent en mode sombre), très grand titre, grille à filets de 1 px, un seul accent orange KEF. Favoris en liste numérotée (« 02 Onde Coaxiale FM ● »), sources sur une ligne de texte, bouton lecture carré, volume en filet + grand chiffre. |
 | **Baladeur** | Boîtier de baladeur MP3 des années 2000 centré dans la fenêtre (blanc nacré en clair, aluminium et molette noire en sombre), écran LCD rétro et **molette cliquable**. Tourner (glisser en rond, crans de 18° avec retour haptique sur les trackpads Force Touch) règle le volume sur « À l'écoute » et parcourt les listes ailleurs ; molette de la souris et flèches ↑↓ aussi. Clics : haut = MENU (retour), bas = lecture/pause, gauche/droite = piste précédente/suivante, bouton central (ou ↩︎/→) = sélectionner ; ← ou Échap = retour. Menus : À l'écoute (pochette, progression ou EN DIRECT, volume en barre pendant qu'on tourne ; bouton central = options : ajouter/retirer des favoris, couper le son, source, veille), Radios favorites (sélection = lecture ; « Modifier l'ordre… » : bouton central pour saisir une radio, tourner pour la déplacer ; glisser-déposer et menu contextuel à la souris), Recherche (saisie + résultats, étoile), Sources, Écoutées récemment (« Tout ajouter aux favoris »), Réglages, Mettre en veille. En veille, écran éteint « En veille » (bouton central = allumer) ; hors ligne, « Réessayer ». Mini-lecteur : même boîtier en réduit (sans recherche). VoiceOver : molette réglable et zones exposées comme boutons. |
+| **Rétro pixel** | Radio-cassette en pixel art dessiné en code (contours sombres, aplats pastel, un reflet par face), mis à l'échelle par multiples entiers du pixel logique pour rester net. Touches du dessus : couper le son, ★ radio en cours, explorateur. Cadran : l'aiguille indique le volume (glisser, molette, flèches). Cassette : titre et artiste en police bitmap 5×7 (défilement façon afficheur LED), pochette pixelisée, bobines qui tournent ; haut-parleurs qui pulsent et antenne déployée pendant la lecture. Touches piano : précédent, lecture/pause, suivant, veille. Panneau Favoris (recherche, liste, glisser-déposer), touches de source, palette nocturne en mode sombre ; en veille, poste grisé et touche d'allumage rouge. Mini-lecteur : poste compact (240 pt). |
+| **Néon 80** | Affiche synthwave dessinée en code (ambiance seulement, aucun visuel repris) : soleil rayé rose-orange avec halo derrière la pochette, skyline art déco et palmiers en silhouette liserés de rose, brume sur l'horizon, reflet du soleil sur l'eau, oiseaux, grille en perspective qui défile pendant la lecture. Pochette dans un double cadre néon cyan / magenta, titre en lettrage chromé (capitales grasses condensées italiques, dégradé argent → rose, contour, lueur), boutons néon qui s'illuminent au survol, volume en égaliseur à barres néon, progression façon ligne d'horizon, sources en puces néon, panneau Favoris en verre bordé de néon. Mode sombre : nuit indigo ; mode clair : heure dorée pastel. En veille : soleil couché, enseigne « OFF » qui vacille par moments, gros bouton d'allumage. La grille est animée par Core Animation (le serveur de rendu, pas l'app) et s'arrête hors lecture, fenêtre masquée ou « Réduire les animations ». Mini-lecteur : carte d'affiche compacte (240 pt). |
 
 Fenêtre : le contenu commence sous la barre de titre (bande de 28 pt réservée,
 seuls les fonds passent dessous) et s'adapte à la taille. Tailles minimales :
 Classique et Éditorial 520 × 540 (une colonne qui défile sous 780 pt de large,
 pochette qui rétrécit avec la hauteur), Hi-Fi 660 × 560 (molette et afficheur à
 l'échelle), Pochette immersive 560 × 540 (sources dans un menu sous 700 pt),
-Baladeur 420 × 560 (boîtier à l'échelle). Le Baladeur a aussi un raccourci
+Baladeur 420 × 560 (boîtier à l'échelle), Rétro pixel 520 × 660 (poste et panneau
+côte à côte au-delà de 860 pt de large, l'un sous l'autre en dessous), Néon 80 540 × 640
+(favoris à droite au-delà de 820 pt de large, sous le lecteur en dessous). Le Baladeur a aussi un raccourci
 Réglages (engrenage) dans la barre de titre de l'écran LCD, mini-lecteur compris.
 
 Mise en œuvre : `AppDesign` (KEFKit, testé : valeurs persistées, analyse tolérante,
@@ -190,9 +196,12 @@ mac/
 │   ├── Transport.swift      décisions pause/stop/reprise et zapping précédent/suivant
 │   ├── FavoritesStore.swift favoris JSON (écriture atomique, import)
 │   ├── SpeakerDiscovery.swift  NWBrowser (_airplay, _raop, _googlecast, _http) + résolution IPv4
-│   └── AppDesign.swift      designs, géométrie des molettes (Hi-Fi, Baladeur), couleur dominante
+│   ├── AppDesign.swift      designs, géométrie des molettes (Hi-Fi, Baladeur), couleur dominante
+│   ├── PixelArt.swift       Rétro pixel : police bitmap, icônes, échelle entière, défilement, géométrie du poste
+│   ├── Synthwave.swift      palette « années 80 » de l'explorateur et du design Néon 80 (dégradés, scènes)
+│   └── FallbackArtwork.swift  pochettes de repli : un style par design, graine stable par station
 └── Sources/KEFRemote/       app SwiftUI (fenêtre, MenuBarExtra, Réglages, MediaPlayer)
-    └── Views/Design/        thème, racines, briques communes et les designs Hi-Fi, Immersif, Éditorial, Baladeur
+    └── Views/Design/        thème, racines, briques communes et les designs Hi-Fi, Immersif, Éditorial, Baladeur, Rétro pixel, Néon 80
 ```
 
 Points d'API (relevés sur une LS50 Wireless II, firmware V41192) :

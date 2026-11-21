@@ -295,9 +295,10 @@ final class ScrollAccumulator {
     }
 }
 
-// MARK: - Couleur de la pochette (design immersif)
+// MARK: - Couleur de la pochette (designs immersif et pixel)
 
-/// Couleur de fond tirée de la pochette et version floutée pour le fond plein cadre,
+/// Couleur de fond tirée de la pochette, version floutée pour le fond plein cadre et
+/// version pixelisée (design « Rétro pixel »),
 /// mises en cache par URL (vignettes de 64 px : le flou est calculé une fois, sur le
 /// processeur, au lieu d'un flou temps réel sur toute la fenêtre).
 @MainActor
@@ -306,12 +307,13 @@ final class CoverColors {
     private var cache: [String: SRGBColor] = [:]
     private var thumbnails: [String: CGImage] = [:]
     private var blurred: [String: CGImage] = [:]
+    private var pixelated: [String: [SRGBColor]] = [:]
     private let context = CIContext(options: [.cacheIntermediates: false])
 
     func color(for source: String?) async -> SRGBColor {
         guard let source else { return DominantColor.fallback }
         if let cached = cache[source] { return cached }
-        guard let image = await thumbnail(for: source) else { return DominantColor.fallback } // échec réseau : pas de mise en cache
+        guard let image = await thumbnail(for: source, style: .immersif) else { return DominantColor.fallback } // échec réseau : pas de mise en cache
         let color = DominantColor.backgroundColor(for: image)
         cache[source] = color
         return color
@@ -321,7 +323,7 @@ final class CoverColors {
     func blurredImage(for source: String?) async -> CGImage? {
         guard let source else { return nil }
         if let cached = blurred[source] { return cached }
-        guard let image = await thumbnail(for: source) else { return nil }
+        guard let image = await thumbnail(for: source, style: .immersif) else { return nil }
         let input = CIImage(cgImage: image)
         let output = input.clampedToExtent()
             .applyingGaussianBlur(sigma: Double(max(image.width, image.height)) * 0.07)
@@ -332,11 +334,35 @@ final class CoverColors {
         return result
     }
 
-    private func thumbnail(for source: String) async -> CGImage? {
-        if let cached = thumbnails[source] { return cached }
-        var image: CGImage?
+    /// Pochette ou logo réduit à `side × side` couleurs (design « Rétro pixel »).
+    func pixelArt(for source: String?, side: Int) async -> [SRGBColor]? {
+        guard let source else { return nil }
+        let key = "\(side)|\(source)"
+        if let cached = pixelated[key] { return cached }
+        let image: CGImage?
         if let hue = DemoArt.hue(from: source) {
-            let renderer = ImageRenderer(content: DemoArtworkView(hue: hue).frame(width: 64, height: 64))
+            // Visuel de démo : la pochette pixel (grille de 12) rendue au pixel près.
+            let renderer = ImageRenderer(content: DemoArtworkView(hue: hue, style: .pixel).frame(width: 12, height: 12))
+            renderer.scale = 1
+            image = renderer.cgImage
+        } else {
+            image = await thumbnail(for: source, style: .pixel)
+        }
+        guard let image, let colors = PixelArt.downsample(image, side: side, levels: DemoArt.hue(from: source) == nil ? 6 : 256)
+        else { return nil }
+        if pixelated.count > 160 { pixelated.removeAll() }
+        pixelated[key] = colors
+        return colors
+    }
+
+    /// Vignette de 64 px ; les visuels de démo sont dessinés dans le style demandé.
+    private func thumbnail(for source: String, style: ArtworkStyle) async -> CGImage? {
+        let demoHue = DemoArt.hue(from: source)
+        let cacheKey = demoHue == nil ? source : "\(style.rawValue)|\(source)"
+        if let cached = thumbnails[cacheKey] { return cached }
+        var image: CGImage?
+        if let hue = demoHue {
+            let renderer = ImageRenderer(content: DemoArtworkView(hue: hue, style: style).frame(width: 64, height: 64))
             image = renderer.cgImage
         } else if let url = ImageURL.resolve(source),
                   let (data, _) = try? await URLSession.shared.data(from: url) {
@@ -344,7 +370,7 @@ final class CoverColors {
         }
         if let image {
             if thumbnails.count > 40 { thumbnails.removeAll() }
-            thumbnails[source] = image
+            thumbnails[cacheKey] = image
         }
         return image
     }

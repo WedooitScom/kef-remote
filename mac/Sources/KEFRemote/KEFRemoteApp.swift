@@ -95,11 +95,15 @@ struct PlayerCommands: Commands {
                 .keyboardShortcut("d", modifiers: .command)
                 .disabled(model.store.snapshot.currentStation == nil)
             Button("Importer des favoris…") { model.importFavorites() }
+            Divider()
+            Button(model.showsExplorer ? "Fermer l'explorateur" : "Explorer les radios…") { model.toggleExplorer() }
+                .keyboardShortcut("e", modifiers: .command)
+                .disabled(model.currentDesign == .baladeur || !model.store.hasClient)
         }
     }
 }
 
-/// Menu « Présentation › Design » (⌃⌘1 … ⌃⌘5).
+/// Menu « Présentation › Design » (⌃⌘1 … ⌃⌘7).
 struct DesignCommands: Commands {
     let model: AppModel
     @Binding var designRaw: String

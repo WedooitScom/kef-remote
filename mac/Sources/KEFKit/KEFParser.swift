@@ -114,7 +114,7 @@ public enum KEFParser {
     /// (filtre « Par genre », dossier, podcast…).
     public static func normalizeStation(_ row: JSONValue?) -> Station? {
         guard let row, let path = row["path"]?.nonEmptyString, let title = row["title"]?.nonEmptyString,
-              path.contains(stationMarker) || path.hasPrefix("demo:")
+              path.contains(stationMarker) || path.hasPrefix(demoStationPrefix)
         else { return nil }
         let meta = row["mediaData"]?["metaData"]
         return Station(

@@ -127,7 +127,7 @@ final class NowPlayingBridge {
         artworkTask?.cancel()
         guard let key else { return }
         artworkTask = Task { [weak self] in
-            guard let image = await ArtworkLoader.image(for: key), !Task.isCancelled, let self, self.artworkKey == key else { return }
+            guard let image = await ArtworkLoader.image(for: key, style: ArtworkStyle(self?.model?.currentDesign ?? .classique)), !Task.isCancelled, let self, self.artworkKey == key else { return }
             self.artwork = Self.makeArtwork(image)
             self.update()
         }
@@ -143,9 +143,9 @@ final class NowPlayingBridge {
 /// Chargement d'images (pochettes, logos) : http(s) via URLSession, `demo://` dessinées localement.
 @MainActor
 enum ArtworkLoader {
-    static func image(for raw: String) async -> NSImage? {
+    static func image(for raw: String, style: ArtworkStyle) async -> NSImage? {
         if let hue = DemoArt.hue(from: raw) {
-            let renderer = ImageRenderer(content: DemoArtworkView(hue: hue).frame(width: 600, height: 600))
+            let renderer = ImageRenderer(content: DemoArtworkView(hue: hue, style: style).frame(width: 600, height: 600))
             renderer.scale = 1
             return renderer.nsImage
         }

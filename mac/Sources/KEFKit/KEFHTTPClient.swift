@@ -97,11 +97,12 @@ public actor KEFHTTPClient: SpeakerClient {
     }
 
     /// `getRows` en suivant les redirections ; renvoie la réponse et le path final.
-    func getRows(_ path: String, count: Int = 50) async throws -> (response: JSONValue, path: String) {
+    /// `to` est inclusif côté enceinte (`from=0&to=2` → 3 rows) : on demande `from…from+count-1`.
+    func getRows(_ path: String, from: Int = 0, count: Int = 50) async throws -> (response: JSONValue, path: String) {
         var current = path
         for _ in 0...Self.maxRedirects {
             let data = try await getJSON("/api/getRows", [
-                ("path", current), ("roles", "@all"), ("from", "0"), ("to", String(count)),
+                ("path", current), ("roles", "@all"), ("from", String(from)), ("to", String(from + max(1, count) - 1)),
             ])
             guard data.objectValue != nil else { throw KEFError.invalidResponse("getRows") }
             let rows = data["rows"]?.arrayValue ?? []
@@ -280,6 +281,20 @@ public actor KEFHTTPClient: SpeakerClient {
         guard let resultsPath = result?["result"]?["path"]?.nonEmptyString else { throw KEFError.noSearchResults }
         // Les résultats mélangent des filtres (/radios/filter/…) et des stations.
         return KEFParser.stations(fromRows: try await getRows(resultsPath, count: Self.searchLimit).response)
+    }
+
+    // MARK: - Explorateur (lecture seule)
+
+    public func browseRadios(_ location: RadioBrowseLocation, from: Int, count: Int) async throws -> RadioBrowsePage {
+        let path: String
+        switch location {
+        case .directory(let directory): path = "\(try await radiosRootPath())/\(directory.relativePath)"
+        case .path(let raw): path = raw
+        }
+        // Chemins opaques renvoyés par l'enceinte : seuls ceux d'airable sont parcourus.
+        guard path.hasPrefix("airable:") else { throw KEFError.invalidResponse("chemin airable attendu") }
+        let (response, final) = try await getRows(path, from: max(0, from), count: count)
+        return KEFParser.browsePage(response, path: final, offset: max(0, from))
     }
 
     @discardableResult

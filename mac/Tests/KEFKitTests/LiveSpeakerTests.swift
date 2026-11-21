@@ -6,7 +6,7 @@ import Testing
 ///
 ///     KEF_LIVE_HOST=192.168.1.50 swift test --filter LiveSpeakerTests
 ///
-/// Lectures uniquement (état, événements, historique, recherche). La seule commande
+/// Lectures uniquement (état, événements, historique, recherche, explorateur). La seule commande
 /// envoyée est la relecture de la station airable *déjà en cours*, et seulement si une
 /// radio airable joue réellement. Volume, source et alimentation ne sont jamais modifiés.
 @Suite("Enceinte réelle (KEF_LIVE_HOST)", .serialized,
@@ -42,6 +42,24 @@ struct LiveSpeakerTests {
         print("[live] recherche « fip » : \(results.prefix(6).map(\.title))")
         #expect(results.allSatisfy { $0.path.contains(KEFParser.stationMarker) })
         #expect(!results.isEmpty)
+    }
+
+    @Test func explorerBrowsing() async throws {
+        let genres = try await client.browseRadios(.directory(.genres), from: 0, count: 50)
+        print("[live] genres : \(genres.items.count)/\(genres.totalCount ?? -1) — \(genres.items.prefix(6).map(\.title))")
+        #expect(genres.items.count > 10)
+        let leaf = try #require(genres.items.first { $0.path.contains("filter\\?g") })
+        let first = try await client.browseRadios(.path(leaf.path), from: 0, count: 50)
+        #expect(first.items.compactMap(\.facet).count == 3)
+        let second = try await client.browseRadios(.path(first.path), from: first.nextOffset, count: 50)
+        print("[live] « \(leaf.title) » : \(first.totalCount ?? -1) rows, page 2 = \(second.items.count) stations")
+        #expect(second.items.allSatisfy { $0.station != nil })
+        #expect(Set(first.items.map(\.id)).isDisjoint(with: second.items.map(\.id)))
+        for directory in RadioDirectory.shelves {
+            let page = try await client.browseRadios(.directory(directory), from: 0, count: 3)
+            print("[live] \(directory.title) : \(page.totalCount ?? -1) — \(page.items.map(\.title))")
+            #expect(!page.items.isEmpty)
+        }
     }
 
     @Test func replayCurrentAirableStationOnlyIfPlaying() async throws {

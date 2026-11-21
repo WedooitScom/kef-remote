@@ -41,29 +41,14 @@ enum DemoArt {
     }
 }
 
-/// Pochette de démonstration : dégradé et cercles concentriques façon Uni-Q.
+/// Pochette de démonstration : pochette de repli (style du design courant, ou `style`)
+/// dont la graine est la teinte de démo, cf. `FallbackArtworkView`.
 struct DemoArtworkView: View {
     let hue: Int
+    var style: ArtworkStyle?
 
     var body: some View {
-        GeometryReader { geo in
-            let s = min(geo.size.width, geo.size.height)
-            ZStack {
-                RadialGradient(
-                    colors: [
-                        Color(hue: Double(hue) / 360, saturation: 0.7, brightness: 0.85),
-                        Color(hue: Double((hue + 30) % 360) / 360, saturation: 0.6, brightness: 0.4),
-                        Color(hue: Double((hue + 60) % 360) / 360, saturation: 0.5, brightness: 0.1),
-                    ],
-                    center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: s * 0.95
-                )
-                Circle().stroke(.white.opacity(0.18), lineWidth: s * 0.004).frame(width: s * 0.77)
-                Circle().stroke(.white.opacity(0.18), lineWidth: s * 0.018).frame(width: s * 0.57)
-                Circle().stroke(.white.opacity(0.18), lineWidth: s * 0.004).frame(width: s * 0.37)
-                Circle().fill(.white.opacity(0.12)).frame(width: s * 0.19)
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
-        }
+        FallbackArtworkView(seed: hue, style: style)
     }
 }
 
@@ -95,13 +80,8 @@ struct StationLogo: View {
 
     var body: some View {
         RemoteImage(source: station.icon) {
-            ZStack {
-                LinearGradient(colors: [Color.kefAccent.opacity(0.85), Color.kefAccent.opacity(0.45)],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-                Text(initials(station.title))
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.92))
-            }
+            // Sans logo : pochette de repli du design, stable d'après le nom.
+            FallbackArtworkView(key: station.title, title: station.title)
         }
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
@@ -128,11 +108,11 @@ struct CoverArtwork: View {
             } else if let source = snapshot.source, source != .wifi {
                 placeholder(symbol: source.symbol, caption: source.label)
             } else if let cover = snapshot.player.coverURL ?? snapshot.player.station?.icon {
-                RemoteImage(source: cover) { placeholder(symbol: "music.note", caption: nil) }
+                RemoteImage(source: cover) { fallback }
                     .id(cover)
                     .transition(.opacity)
             } else {
-                placeholder(symbol: "hifispeaker.2.fill", caption: nil)
+                fallback
             }
         }
         .aspectRatio(1, contentMode: .fit)
@@ -142,6 +122,12 @@ struct CoverArtwork: View {
                 .strokeBorder(.white.opacity(0.12), lineWidth: 0.5)
         )
         .animation(.easeInOut(duration: 0.3), value: snapshot.player.coverURL)
+    }
+
+    /// Pas de pochette : pochette de repli du design, d'après la station (ou la piste).
+    private var fallback: some View {
+        let station = snapshot.player.station?.title
+        return FallbackArtworkView(key: station ?? snapshot.player.title ?? snapshot.player.artist ?? "KEF", title: station)
     }
 
     private func placeholder(symbol: String, caption: String?) -> some View {

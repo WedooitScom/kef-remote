@@ -27,6 +27,11 @@ final class AppModel {
     private(set) var searchError: String?
     private var searchTask: Task<Void, Never>?
 
+    /// Explorateur de radios (pays, genres, langues, étagères), lecture seule côté enceinte.
+    let explorer: RadioExplorerModel
+    /// Panneau de l'explorateur ouvert (designs fenêtrés ; le Baladeur a son propre menu).
+    var showsExplorer = false
+
     /// Design imposé pour la session (`--design <nom>`, captures `--snapshot`), prioritaire
     /// sur la préférence enregistrée et jamais mémorisé.
     var designOverride: AppDesign?
@@ -71,6 +76,11 @@ final class AppModel {
             favorites = FavoritesStore(fileURL: FavoritesStore.defaultURL(fileName: isDemo ? "favorites-demo.json" : "favorites.json"))
         }
 
+        let store = store
+        explorer = RadioExplorerModel { location, from, count in
+            try await store.browseRadios(location, from: from, count: count)
+        }
+
         connect()
         nowPlaying = NowPlayingBridge(model: self)
         installKeyMonitor()
@@ -84,6 +94,7 @@ final class AppModel {
         history = []
         historyLoaded = false
         searchResults = []
+        explorer.reset()
         if isDemo {
             store.connect(DemoSpeakerClient())
         } else if let host {
@@ -151,6 +162,21 @@ final class AppModel {
 
     func play(_ station: Station) {
         Task { await store.playStation(station) }
+    }
+
+    // MARK: - Explorateur
+
+    /// Ouvre (ou ferme) l'explorateur ; précharge les aperçus de l'accueil.
+    func toggleExplorer() {
+        withAnimation(.spring(duration: 0.35)) { showsExplorer.toggle() }
+        if showsExplorer { explorer.loadShelves() }
+    }
+
+    /// Ajoute / retire une station des favoris, avec un bref message.
+    func toggleFavorite(_ station: Station) {
+        withAnimation { favorites.toggle(station) }
+        showToast(favorites.contains(station) ? "« \(station.title) » ajoutée aux favoris"
+                                              : "« \(station.title) » retirée des favoris")
     }
 
     // MARK: - Précédent / suivant

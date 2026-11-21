@@ -17,7 +17,7 @@ struct SettingsView: View {
             } header: {
                 Text("Design")
             } footer: {
-                Text("S'applique à la fenêtre et au mini-lecteur. Aussi dans le menu Présentation › Design (⌃⌘1 à ⌃⌘5).")
+                Text("S'applique à la fenêtre et au mini-lecteur. Aussi dans le menu Présentation › Design (⌃⌘1 à ⌃⌘7).")
                     .font(.caption).foregroundStyle(.secondary)
             }
 

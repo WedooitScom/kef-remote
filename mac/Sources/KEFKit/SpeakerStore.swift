@@ -443,4 +443,10 @@ public final class SpeakerStore {
         guard let client else { throw KEFError.notConfigured }
         return try await client.searchStations(query)
     }
+
+    /// Explorateur de radios : une page d'un conteneur airable (lecture seule).
+    public func browseRadios(_ location: RadioBrowseLocation, from: Int, count: Int) async throws -> RadioBrowsePage {
+        guard let client else { throw KEFError.notConfigured }
+        return try await client.browseRadios(location, from: from, count: count)
+    }
 }

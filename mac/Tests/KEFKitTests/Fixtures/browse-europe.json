@@ -1,0 +1,93 @@
+{
+ "rowsCount": 53,
+ "rows": [
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?o\\=6367601698730142",
+   "containerType": "none",
+   "title": "Tout de: Europe",
+   "id": "airable://airable.radios/directory/stations",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?o\\=4983743957243860",
+   "containerType": "none",
+   "title": "Albanie",
+   "id": "airable://airable/place/4983743957243860",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/8777677923440934",
+   "containerType": "none",
+   "title": "Allemagne",
+   "id": "airable://airable/place/8777677923440934",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?o\\=5050060213077814",
+   "containerType": "none",
+   "title": "Andorre",
+   "id": "airable://airable/place/5050060213077814",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/3803835391998291",
+   "containerType": "none",
+   "title": "Autriche",
+   "id": "airable://airable/place/3803835391998291",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/9617455659899862",
+   "containerType": "none",
+   "title": "Belgique",
+   "id": "airable://airable/place/9617455659899862",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?o\\=6385471057146788",
+   "containerType": "none",
+   "title": "Biélorussie",
+   "id": "airable://airable/place/6385471057146788",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/4962360724806786",
+   "containerType": "none",
+   "title": "Bosnie-Herzégovine",
+   "id": "airable://airable/place/4962360724806786",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/2953547008801251",
+   "containerType": "none",
+   "title": "Bulgarie",
+   "id": "airable://airable/place/2953547008801251",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?o\\=8003093468956650",
+   "containerType": "none",
+   "title": "Chypre",
+   "id": "airable://airable/place/8003093468956650",
+   "type": "container"
+  }
+ ],
+ "roles": {
+  "mediaData": {
+   "metaData": {
+    "serviceID": "airable"
+   }
+  },
+  "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins/6367601698730142",
+  "containerType": "none",
+  "icon": "",
+  "title": "Région: Europe",
+  "description": "",
+  "id": "airable://airable.radios/listing/filter.origins"
+ }
+}

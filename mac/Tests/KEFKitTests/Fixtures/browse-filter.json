@@ -1,0 +1,39 @@
+{
+ "rowsCount": 3,
+ "rows": [
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/origins",
+   "containerType": "none",
+   "title": "Par localité",
+   "id": "airable://airable.radios/filter/filter.origins",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/languages",
+   "containerType": "none",
+   "title": "Par langue",
+   "id": "airable://airable.radios/filter/filter.languages",
+   "type": "container"
+  },
+  {
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres",
+   "containerType": "none",
+   "title": "Par genre",
+   "id": "airable://airable.radios/filter/filter.genres",
+   "type": "container"
+  }
+ ],
+ "roles": {
+  "mediaData": {
+   "metaData": {
+    "serviceID": "airable"
+   }
+  },
+  "path": "airable:https://1234567890.airable.io/airable/radios/filter",
+  "containerType": "none",
+  "icon": "",
+  "title": "Filtre",
+  "description": "",
+  "id": "airable://airable.radios/listing/filter"
+ }
+}

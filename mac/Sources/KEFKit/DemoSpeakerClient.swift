@@ -32,7 +32,7 @@ public actor DemoSpeakerClient: SpeakerClient {
     /// `controls` relevé sur une radio airable : ni pause, ni précédent / suivant.
     static let liveCapabilities = TransportCapabilities(pause: nil, next: false, previous: false, seek: false)
 
-    /// Pochette générée par l'UI (dégradé + cercles Uni-Q) : `demo://art?hue=24`.
+    /// Pochette générée par l'UI (scène « années 80 » propre à la teinte) : `demo://art?hue=24`.
     public static func artURL(hue: Int) -> String { "demo://art?hue=\(hue)" }
 
     /// Stations fictives du mode démo (favoris de démonstration, captures d'écran).
@@ -82,7 +82,7 @@ public actor DemoSpeakerClient: SpeakerClient {
 
     private func currentPlayer() -> PlayerInfo {
         guard power == .on, source == .wifi else { return .stopped }
-        if let n = stationNumber, let st = Self.stations.first(where: { $0.n == n }) {
+        if let n = stationNumber, let st = Self.demoStation(n) {
             // Comme la vraie enceinte : après « stop », le lecteur ne décrit plus la radio.
             guard state != .stopped else { return .stopped }
             return PlayerInfo(state: state, title: st.now, artist: st.title, coverURL: Self.artURL(hue: st.hue),
@@ -209,7 +209,7 @@ public actor DemoSpeakerClient: SpeakerClient {
     }
 
     public func radioHistory() async throws -> [Station] {
-        history.compactMap { n in Self.stations.first(where: { $0.n == n }).map(Self.station) }
+        history.compactMap { n in Self.demoStation(n).map(Self.station) }
     }
 
     public func searchStations(_ query: String) async throws -> [Station] {
@@ -222,7 +222,7 @@ public actor DemoSpeakerClient: SpeakerClient {
     @discardableResult
     public func playStation(path: String) async throws -> Station {
         guard path.hasPrefix("demo:radio/"), let n = Int(path.dropFirst("demo:radio/".count)),
-              let st = Self.stations.first(where: { $0.n == n })
+              let st = Self.demoStation(n)
         else { throw KEFError.notAStation }
         try await simulateLatency()
         stationNumber = n
@@ -237,6 +237,21 @@ public actor DemoSpeakerClient: SpeakerClient {
         pending.source = "wifi"
         notifyPlayer()
         return Self.station(st)
+    }
+
+    public func browseRadios(_ location: RadioBrowseLocation, from: Int, count: Int) async throws -> RadioBrowsePage {
+        if latency > .zero { try await Task.sleep(for: .milliseconds(120)) }
+        let path: String
+        switch location {
+        case .directory(let directory): path = "\(Self.browseRoot)/\(directory.relativePath)"
+        case .path(let raw): path = raw
+        }
+        guard let (title, rows) = Self.browseResponse(path) else { throw KEFError.http(404, "") }
+        let start = min(max(0, from), rows.count)
+        let page = Array(rows[start..<min(rows.count, start + max(1, count))])
+        let response: JSONValue = ["rowsCount": .int(Int64(rows.count)), "rows": .array(page),
+                                   "roles": ["title": .string(title), "path": .string(path)]]
+        return KEFParser.browsePage(response, path: path, offset: start)
     }
 
     /// Minuscules sans accents, pour une recherche tolérante.

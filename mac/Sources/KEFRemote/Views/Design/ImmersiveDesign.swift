@@ -542,6 +542,10 @@ struct ImmersiveMainView: View {
                     sourceMenu
                 }
                 Rectangle().fill(.white.opacity(0.18)).frame(width: 1, height: 18)
+                Button { showSearch = false; model.toggleExplorer() } label: { Image(systemName: "safari") }
+                    .buttonStyle(GlassIconStyle(active: model.showsExplorer))
+                    .help("Explorer les radios par pays, genre et langue (⌘E)")
+                    .accessibilityLabel("Explorer les radios")
                 Button { showSearch.toggle() } label: { Image(systemName: "magnifyingglass") }
                     .buttonStyle(GlassIconStyle(active: showSearch))
                     .keyboardShortcut("f", modifiers: .command)

@@ -7,7 +7,7 @@ import Foundation
 /// Designs de l'interface (fenêtre principale et mini-lecteur). Seule la présentation
 /// change : l'état, les commandes et les favoris sont communs.
 public enum AppDesign: String, CaseIterable, Identifiable, Sendable {
-    case classique, hifi, immersif, editorial, baladeur
+    case classique, hifi, immersif, editorial, baladeur, pixel, neon
 
     public var id: String { rawValue }
 
@@ -23,6 +23,8 @@ public enum AppDesign: String, CaseIterable, Identifiable, Sendable {
         case .immersif: "Pochette immersive"
         case .editorial: "Éditorial"
         case .baladeur: "Baladeur"
+        case .pixel: "Rétro pixel"
+        case .neon: "Néon 80"
         }
     }
 
@@ -34,6 +36,8 @@ public enum AppDesign: String, CaseIterable, Identifiable, Sendable {
         case .immersif: "La pochette en grand, couleurs tirées de l'image."
         case .editorial: "Grande typographie, filets fins, accent orange."
         case .baladeur: "Écran rétro et molette cliquable."
+        case .pixel: "Radio-cassette en pixel art : cadran, cassette, touches piano."
+        case .neon: "Affiche synthwave : coucher de soleil, grille, palmiers, néons rose et cyan."
         }
     }
 
@@ -52,6 +56,8 @@ public enum AppDesign: String, CaseIterable, Identifiable, Sendable {
         case "immersif", "immersive", "pochette", "pochetteimmersive", "cover": return .immersif
         case "editorial": return .editorial
         case "baladeur", "ipod", "retro", "mp3": return .baladeur
+        case "pixel", "retropixel", "pixelart", "8bit", "boombox", "radiocassette", "cassette": return .pixel
+        case "neon", "neon80", "neons", "synthwave", "retrowave", "miami", "annees80", "80s": return .neon
         default: return nil
         }
     }

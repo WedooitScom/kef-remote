@@ -23,6 +23,8 @@ public protocol SpeakerClient: Sendable {
     /// Joue une station et renvoie la station normalisée.
     @discardableResult
     func playStation(path: String) async throws -> Station
+    /// Explorateur : une page (`count` rows à partir de `from`) d'un conteneur airable.
+    func browseRadios(_ location: RadioBrowseLocation, from: Int, count: Int) async throws -> RadioBrowsePage
 }
 
 public enum KEFError: LocalizedError, Equatable, Sendable {

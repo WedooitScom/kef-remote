@@ -9,7 +9,7 @@ struct AppDesignTests {
 
     @Test func rawValuesAreStable() {
         // Valeurs persistées dans UserDefaults : ne pas les renommer.
-        #expect(AppDesign.allCases.map(\.rawValue) == ["classique", "hifi", "immersif", "editorial", "baladeur"])
+        #expect(AppDesign.allCases.map(\.rawValue) == ["classique", "hifi", "immersif", "editorial", "baladeur", "pixel", "neon"])
         #expect(AppDesign.storageKey == "appDesign")
         #expect(AppDesign.defaultDesign == .classique)
     }
@@ -25,7 +25,15 @@ struct AppDesignTests {
         #expect(AppDesign.parse("Baladeur") == .baladeur)
         #expect(AppDesign.parse("iPod") == .baladeur)
         #expect(AppDesign.parse("rétro") == .baladeur)
-        #expect(AppDesign.parse("néon") == nil)
+        #expect(AppDesign.parse("Rétro pixel") == .pixel)
+        #expect(AppDesign.parse("pixel-art") == .pixel)
+        #expect(AppDesign.parse("boombox") == .pixel)
+        #expect(AppDesign.parse("néon") == .neon)
+        #expect(AppDesign.parse("Néon 80") == .neon)
+        #expect(AppDesign.parse("neon-80") == .neon)
+        #expect(AppDesign.parse("Synthwave") == .neon)
+        #expect(AppDesign.parse("années 80") == .neon)
+        #expect(AppDesign.parse("néon 90") == nil)
         #expect(AppDesign.parse("") == nil)
         #expect(AppDesign.parse(nil) == nil)
     }
@@ -48,6 +56,20 @@ struct AppDesignTests {
         #expect(AppDesign.stored(defaults.string(forKey: AppDesign.storageKey)) == .editorial)
         defaults.set(AppDesign.baladeur.rawValue, forKey: AppDesign.storageKey)
         #expect(AppDesign.stored(defaults.string(forKey: AppDesign.storageKey)) == .baladeur)
+    }
+
+    @Test func neonDesign() {
+        // 7e design : ⌃⌘7, libellé, valeur stockée, pochette de repli synthwave.
+        #expect(AppDesign.allCases.count == 7)
+        #expect(AppDesign.allCases.last == .neon)
+        #expect(AppDesign.neon.rawValue == "neon")
+        #expect(AppDesign.neon.label == "Néon 80")
+        #expect(!AppDesign.neon.summary.isEmpty)
+        #expect(AppDesign.stored("neon") == .neon)
+        #expect(ArtworkStyle(.neon) == .neon80)
+        let spec = FallbackArtwork.spec(style: ArtworkStyle(.neon), seed: FallbackArtwork.seed(for: "Zénith 80"))
+        #expect(spec.style == .neon80)
+        #expect(spec == FallbackArtwork.spec(style: .neon80, seed: FallbackArtwork.seed(for: "zenith 80")))
     }
 
     @Test func labelsAreDistinct() {

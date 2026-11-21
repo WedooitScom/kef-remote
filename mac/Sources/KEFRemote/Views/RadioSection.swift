@@ -19,6 +19,8 @@ struct RadioSection: View {
         HStack(alignment: .firstTextBaseline) {
             Text("Radios favorites").font(.title3.weight(.semibold))
             Spacer()
+            ExplorerButton(showsLabel: true)
+                .padding(.trailing, 4)
             CurrentFavoriteButton()
             FavoritesMenu()
         }

@@ -389,6 +389,8 @@ struct EditorialMainView: View {
             HStack(alignment: .firstTextBaseline) {
                 Text("Radios").font(.system(size: 24, weight: .heavy)).tracking(-0.8)
                 Spacer()
+                ExplorerButton(size: 14, showsLabel: true)
+                    .padding(.trailing, 4)
                 CurrentFavoriteButton(size: 14)
                 FavoritesMenu(size: 14)
             }

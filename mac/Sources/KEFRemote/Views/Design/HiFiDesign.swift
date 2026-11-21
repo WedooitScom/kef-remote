@@ -622,6 +622,7 @@ struct HiFiMainView: View {
                             Spacer(minLength: 6)
                             SearchField(text: $model.searchText, isSearching: model.isSearching, prompt: "RECHERCHER…")
                                 .frame(maxWidth: 240)
+                            ExplorerButton(size: 14)
                             CurrentFavoriteButton(size: 14)
                             FavoritesMenu(size: 14)
                         }

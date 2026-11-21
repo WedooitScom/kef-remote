@@ -1,0 +1,354 @@
+{
+ "rowsCount": 28,
+ "rows": [
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/4259184787981212",
+   "containerType": "none",
+   "title": "Actualités",
+   "id": "airable://airable/genre/4259184787981212",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=8293267769273371",
+   "containerType": "none",
+   "title": "Bande son",
+   "id": "airable://airable/genre/8293267769273371",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=1286603173706680",
+   "containerType": "none",
+   "title": "Club 40",
+   "id": "airable://airable/genre/1286603173706680",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=5203943644650281",
+   "containerType": "none",
+   "title": "Collège",
+   "id": "airable://airable/genre/5203943644650281",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=7815991302020849",
+   "containerType": "none",
+   "title": "Comédie musicale",
+   "id": "airable://airable/genre/7815991302020849",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/4549569578841329",
+   "containerType": "none",
+   "title": "Country",
+   "id": "airable://airable/genre/4549569578841329",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=5380255624186248",
+   "containerType": "none",
+   "title": "Divertissement",
+   "id": "airable://airable/genre/5380255624186248",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/3531998843420297",
+   "containerType": "none",
+   "title": "Décennies",
+   "id": "airable://airable/genre/3531998843420297",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/4064656799659133",
+   "containerType": "none",
+   "title": "Easy listening",
+   "id": "airable://airable/genre/4064656799659133",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/5615540951956064",
+   "containerType": "none",
+   "title": "Electronic Dance",
+   "id": "airable://airable/genre/5615540951956064",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=7625851453747601",
+   "containerType": "none",
+   "title": "Enfants",
+   "id": "airable://airable/genre/7625851453747601",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=9543168084230275",
+   "containerType": "none",
+   "title": "Freeform-Eclectic",
+   "id": "airable://airable/genre/9543168084230275",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/2109087887220084",
+   "containerType": "none",
+   "title": "Hip-Hop Rap",
+   "id": "airable://airable/genre/2109087887220084",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/5755660091526807",
+   "containerType": "none",
+   "title": "Jazz",
+   "id": "airable://airable/genre/5755660091526807",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/1980926793999970",
+   "containerType": "none",
+   "title": "Musique classique",
+   "id": "airable://airable/genre/1980926793999970",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=4517083698417992",
+   "containerType": "none",
+   "title": "Musique folk",
+   "id": "airable://airable/genre/4517083698417992",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=7563682488165797",
+   "containerType": "none",
+   "title": "Musique religieuse",
+   "id": "airable://airable/genre/7563682488165797",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/6009666957426817",
+   "containerType": "none",
+   "title": "Musiques du monde-Traditionnel",
+   "id": "airable://airable/genre/6009666957426817",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=5797228447161615",
+   "containerType": "none",
+   "title": "Oldies",
+   "id": "airable://airable/genre/5797228447161615",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/7708312818314881",
+   "containerType": "none",
+   "title": "Pop",
+   "id": "airable://airable/genre/7708312818314881",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=6590954788029194",
+   "containerType": "none",
+   "title": "Public-Communauté",
+   "id": "airable://airable/genre/6590954788029194",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/7673478994984180",
+   "containerType": "none",
+   "title": "Reggae",
+   "id": "airable://airable/genre/7673478994984180",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=3921643271576613",
+   "containerType": "none",
+   "title": "Religion",
+   "id": "airable://airable/genre/3921643271576613",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/2330930586904287",
+   "containerType": "none",
+   "title": "Rock",
+   "id": "airable://airable/genre/2330930586904287",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=1524725142866373",
+   "containerType": "none",
+   "title": "Saisonnier",
+   "id": "airable://airable/genre/1524725142866373",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=4507463201414794",
+   "containerType": "none",
+   "title": "Sport",
+   "id": "airable://airable/genre/4507463201414794",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres/3190917816944420",
+   "containerType": "none",
+   "title": "Urbain",
+   "id": "airable://airable/genre/3190917816944420",
+   "type": "container"
+  },
+  {
+   "mediaData": {
+    "metaData": {
+     "serviceID": "airable"
+    }
+   },
+   "path": "airable:https://1234567890.airable.io/airable/radios/filter\\?g\\=1087725375778973",
+   "containerType": "none",
+   "title": "Éducation",
+   "id": "airable://airable/genre/1087725375778973",
+   "type": "container"
+  }
+ ],
+ "roles": {
+  "mediaData": {
+   "metaData": {
+    "serviceID": "airable"
+   }
+  },
+  "path": "airable:https://1234567890.airable.io/airable/radios/filter/genres",
+  "containerType": "none",
+  "icon": "",
+  "title": "Genre: ",
+  "description": "",
+  "id": "airable://airable.radios/listing/filter.origins"
+ }
+}

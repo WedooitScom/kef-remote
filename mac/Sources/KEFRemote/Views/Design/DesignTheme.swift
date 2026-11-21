@@ -49,6 +49,18 @@ struct DesignTheme {
         fieldCornerRadius: 3, forcedScheme: nil
     )
 
+    static let pixel = DesignTheme(
+        design: .pixel, accent: PixelPalette.Dynamic.accent, favorite: PixelPalette.Dynamic.favorite,
+        fieldFill: AnyShapeStyle(PixelPalette.Dynamic.card), fieldStroke: PixelPalette.Dynamic.ink,
+        fieldCornerRadius: 0, forcedScheme: nil
+    )
+
+    static let neon = DesignTheme(
+        design: .neon, accent: NeonPalette.Dynamic.accent, favorite: NeonPalette.Dynamic.favorite,
+        fieldFill: AnyShapeStyle(NeonPalette.Dynamic.field), fieldStroke: NeonPalette.Dynamic.fieldStroke,
+        fieldCornerRadius: 8, forcedScheme: nil
+    )
+
     static func of(_ design: AppDesign) -> DesignTheme {
         switch design {
         case .classique: .classique
@@ -56,6 +68,8 @@ struct DesignTheme {
         case .immersif: .immersif
         case .editorial: .editorial
         case .baladeur: .baladeur
+        case .pixel: .pixel
+        case .neon: .neon
         }
     }
 }
@@ -148,6 +162,8 @@ enum DesignLayout {
         case .immersif: NSSize(width: 560, height: 540)
         case .editorial: NSSize(width: 520, height: 540)
         case .baladeur: NSSize(width: 420, height: 560)
+        case .pixel: NSSize(width: 520, height: 660)
+        case .neon: NSSize(width: 540, height: 640)
         }
     }
 }
@@ -175,6 +191,16 @@ struct MainRoot: View {
                 EditorialMainView().transition(.opacity)
             case .baladeur:
                 BaladeurMainView().transition(.opacity)
+            case .pixel:
+                PixelMainView().transition(.opacity)
+            case .neon:
+                NeonMainView().transition(.opacity)
+            }
+            // Explorateur de radios (le Baladeur a son propre menu « Explorer »).
+            if model.showsExplorer && design != .baladeur {
+                RadioExplorerView()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1)
             }
         }
         // Les vues de design dessinent leur fond sous la barre de titre (`ignoresSafeArea`)
@@ -196,7 +222,7 @@ struct MainRoot: View {
 }
 
 /// Menu des designs (icône palette, coche sur le design affiché) : barre de titre de la
-/// fenêtre principale. Lisible sur les fonds clairs comme sombres des cinq designs.
+/// fenêtre principale. Lisible sur les fonds clairs comme sombres de tous les designs.
 struct DesignMenuButton: View {
     @Environment(AppModel.self) private var model
     @Environment(\.colorScheme) private var scheme
@@ -223,7 +249,7 @@ struct DesignMenuButton: View {
         .padding(.horizontal, 5)
         .padding(.vertical, 3)
         .background(Capsule().fill(scheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.06)))
-        .help("Design : \(selection.wrappedValue.label) (⌃⌘1 … ⌃⌘5)")
+        .help("Design : \(selection.wrappedValue.label) (⌃⌘1 … ⌃⌘\(AppDesign.allCases.count))")
         .accessibilityLabel("Choisir le design")
         .accessibilityValue(selection.wrappedValue.label)
     }
@@ -277,6 +303,8 @@ struct MiniPlayerRoot: View {
             case .immersif: ImmersiveMiniPlayer()
             case .editorial: EditorialMiniPlayer()
             case .baladeur: BaladeurMiniPlayer()
+            case .pixel: PixelMiniPlayer()
+            case .neon: NeonMiniPlayer()
             }
         }
         .transition(.opacity)
@@ -324,11 +352,16 @@ struct DesignPicker: View {
                                     .strokeBorder(selected ? Color.kefAccent : .primary.opacity(0.15), lineWidth: selected ? 2.5 : 1)
                             )
                             .shadow(color: .black.opacity(selected ? 0.2 : 0.08), radius: selected ? 5 : 2, y: 1)
-                        HStack(spacing: 3) {
+                        HStack(alignment: .firstTextBaseline, spacing: 3) {
                             if selected {
                                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.kefAccent)
                             }
-                            Text(design.label).lineLimit(1).minimumScaleFactor(0.8)
+                            // Sept vignettes : les libellés longs passent sur deux lignes.
+                            Text(design.label)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                                .minimumScaleFactor(0.8)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .font(.caption.weight(selected ? .semibold : .regular))
                     }
@@ -392,10 +425,10 @@ struct DesignThumbnail: View {
             case .immersif:
                 ZStack(alignment: .top) {
                     // Pochette floutée plein cadre, colonne centrée, pastilles en bas.
-                    DemoArtworkView(hue: 280).scaleEffect(1.6).blur(radius: 8)
+                    DemoArtworkView(hue: 280, style: .immersif).scaleEffect(1.6).blur(radius: 8)
                     LinearGradient(colors: [.clear, Color(hex: 0x1C1028).opacity(0.85)], startPoint: .top, endPoint: .bottom)
                     Capsule().fill(.white.opacity(0.16)).frame(width: w * 0.88, height: h * 0.09).offset(y: h * 0.05)
-                    DemoArtworkView(hue: 280).frame(width: h * 0.4, height: h * 0.4)
+                    DemoArtworkView(hue: 280, style: .immersif).frame(width: h * 0.4, height: h * 0.4)
                         .clipShape(RoundedRectangle(cornerRadius: 3)).offset(y: h * 0.19)
                     Capsule().fill(.white).frame(width: w * 0.3, height: h * 0.06).offset(y: h * 0.63)
                     Circle().fill(.white).frame(width: h * 0.12).offset(y: h * 0.72)
@@ -430,6 +463,10 @@ struct DesignThumbnail: View {
                         .overlay(Circle().strokeBorder(.black.opacity(0.12), lineWidth: 0.5))
                         .frame(width: h * 0.12).offset(y: h * 0.19)
                 }
+            case .pixel:
+                PixelThumbnailArt()
+            case .neon:
+                NeonThumbnailArt()
             case .editorial:
                 ZStack(alignment: .topLeading) {
                     Color(hex: 0xF4F1EA)

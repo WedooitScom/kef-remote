@@ -14,7 +14,10 @@ import SwiftUI
 ///   fenêtre (`main-<nom>-900x560.png`) ; `min` = taille minimale du design (`-min`).
 /// - `--snapshot-extras` (démo) : en plus, fenêtre à la taille minimale (`-min`), état
 ///   veille (`-veille`), structure des menus (`menus.txt`) et Réglages (`reglages.png`) ;
-///   pour le Baladeur, écrans de menu (`main-baladeur-menu`, `-favorites`, `-options`, `-sources`).
+///   planche des pochettes de repli de chaque style (`artwork.png`) ;
+///   pour le Baladeur, écrans de menu (`main-baladeur-menu`, `-favorites`, `-options`, `-sources`) ;
+///   explorateur de radios (`main-<nom>-explorer`, `-explorer-genres`, `-explorer-stations`,
+///   `-explorer-stations-min`, `-explorer-pays` ; Baladeur : `main-baladeur-explore`, `-explore-genres`, `-explore-stations`).
 ///
 /// Les favoris viennent d'un fichier temporaire (garni des stations fictives en démo),
 /// jamais de celui de l'utilisateur ; en démo, une radio est mise en lecture.
@@ -121,6 +124,11 @@ enum Snapshotter {
             }
 
             if extras {
+                // Explorateur (avant les Réglages : une seule fenêtre visible).
+                await captureExplorer(model: model, designs: designs, to: dir)
+            }
+
+            if extras {
                 // Taille minimale de la fenêtre.
                 if let window = mainWindow() {
                     let frame = window.frame
@@ -143,6 +151,7 @@ enum Snapshotter {
                 }
                 await model.store.setPower(on: true)
                 writeMenus(to: dir.appendingPathComponent("menus.txt"))
+                writeArtworkSheet(to: dir.appendingPathComponent("artwork.png"))
                 // Réglages (choix du design par vignettes).
                 let main = mainWindow()
                 if let appMenu = NSApp.mainMenu?.items.first?.submenu,
@@ -164,6 +173,89 @@ enum Snapshotter {
         }
     }
 
+    /// Explorateur (démo) : accueil, genres, liste de stations (avec une station déjà en
+    /// favori et une ajoutée à l'instant, pour l'étoile et le message), pays d'Europe.
+    private static func captureExplorer(model: AppModel, designs: [AppDesign?], to dir: URL) async {
+        let explorer = model.explorer
+        func open(_ title: String, in page: RadioExplorerPage?) async -> RadioExplorerPage? {
+            guard let item = page?.items.first(where: { $0.title == title || $0.displayTitle == title && $0.isAllOf }),
+                  let next = explorer.open(item) else { return nil }
+            await explorer.waitUntilLoaded(next)
+            return next
+        }
+        /// Genres › Jazz › Tout Jazz ; deux stations en favori (dont une ajoutée avec message).
+        func openJazzStations() async {
+            explorer.popToRoot()
+            let genres = explorer.open(.genres)
+            await explorer.waitUntilLoaded(genres)
+            let jazz = await open("Jazz", in: genres)
+            if let all = jazz?.items.first(where: \.isAllOf), let leaf = explorer.open(all) {
+                await explorer.waitUntilLoaded(leaf)
+                let stations = leaf.stations
+                if stations.count > 2, !model.favorites.contains(stations[2]) { model.favorites.add(stations[2]) }
+                if stations.count > 1 {
+                    if model.favorites.contains(stations[1]) { model.favorites.remove(stations[1]) }
+                    model.toggleFavorite(stations[1])
+                }
+            }
+        }
+
+        for design in designs {
+            guard (design ?? model.currentDesign) != .baladeur else { continue }
+            await show(design, model: model)
+            let name = "main\(design.map { "-\($0.rawValue)" } ?? "")-explorer"
+            explorer.popToRoot()
+            if !model.showsExplorer { model.toggleExplorer() }
+            for page in explorer.shelves.values { await explorer.waitUntilLoaded(page) }
+            try? await Task.sleep(for: .seconds(1.2))
+            captureMainWindow(to: dir, name: name)
+
+            let genres = explorer.open(.genres)
+            await explorer.waitUntilLoaded(genres)
+            try? await Task.sleep(for: .seconds(0.8))
+            captureMainWindow(to: dir, name: "\(name)-genres")
+
+            await openJazzStations()
+            try? await Task.sleep(for: .seconds(1))
+            captureMainWindow(to: dir, name: "\(name)-stations")
+            // Même liste à la taille minimale de la fenêtre (mise en page adaptative).
+            if let window = mainWindow() {
+                let frame = window.frame
+                window.setContentSize(DesignLayout.minimumSize(design ?? model.currentDesign))
+                try? await Task.sleep(for: .seconds(0.8))
+                captureMainWindow(to: dir, name: "\(name)-stations-min")
+                window.setFrame(frame, display: true)
+                try? await Task.sleep(for: .seconds(0.4))
+            }
+
+            explorer.popToRoot()
+            let countries = explorer.open(.countries)
+            await explorer.waitUntilLoaded(countries)
+            _ = await open("Europe", in: countries)
+            try? await Task.sleep(for: .seconds(0.8))
+            captureMainWindow(to: dir, name: "\(name)-pays")
+            model.showsExplorer = false
+        }
+
+        if designs.contains(.baladeur) {
+            await show(.baladeur, model: model)
+            explorer.popToRoot()
+            explorer.loadShelves()
+            NotificationCenter.default.post(name: BaladeurScreen.showNotification, object: "explore")
+            try? await Task.sleep(for: .seconds(0.8))
+            captureMainWindow(to: dir, name: "main-baladeur-explore")
+            let genres = explorer.open(.genres)
+            await explorer.waitUntilLoaded(genres)
+            try? await Task.sleep(for: .seconds(0.8))
+            captureMainWindow(to: dir, name: "main-baladeur-explore-genres")
+            await openJazzStations()
+            try? await Task.sleep(for: .seconds(0.8))
+            captureMainWindow(to: dir, name: "main-baladeur-explore-stations")
+            explorer.popToRoot()
+            NotificationCenter.default.post(name: BaladeurScreen.showNotification, object: "nowPlaying")
+        }
+    }
+
     private static func show(_ design: AppDesign?, model: AppModel) async {
         guard let design else { return }
         model.designOverride = design
@@ -172,11 +264,19 @@ enum Snapshotter {
     }
 
     private static func mainWindow() -> NSWindow? {
-        NSApp.windows.first { $0.isVisible && ($0.contentView?.bounds.width ?? 0) > 200 }
+        mainWindows().first
+    }
+
+    /// Fenêtre principale (identifiant SwiftUI « main ») ; à défaut, toute fenêtre visible
+    /// assez grande. Écarte une fenêtre Réglages restaurée d'un lancement précédent.
+    private static func mainWindows() -> [NSWindow] {
+        let visible = NSApp.windows.filter { $0.isVisible && ($0.contentView?.bounds.width ?? 0) > 200 }
+        let main = visible.filter { $0.identifier?.rawValue.hasPrefix("main") == true }
+        return main.isEmpty ? visible : main
     }
 
     private static func captureMainWindow(to dir: URL, name: String?) {
-        for window in NSApp.windows where window.isVisible {
+        for window in mainWindows() {
             guard let view = window.contentView, view.bounds.width > 200 else { continue }
             let title = name ?? (window.title.isEmpty ? "window-\(window.windowNumber)" : window.title)
             write(view: view, to: dir.appendingPathComponent("\(title).png"))
@@ -196,6 +296,49 @@ enum Snapshotter {
         try? await Task.sleep(for: .seconds(1.5))
         write(view: host, to: url)
         panel.orderOut(nil)
+    }
+
+    /// Planche des pochettes de repli : une ligne par style, en grand (96 pt) et en petit (24 pt).
+    private static func writeArtworkSheet(to url: URL) {
+        let titles = ["Radio Cuivre", "Onde Coaxiale FM", "Basse Fréquence", "Kent Info", "Zénith 80"]
+        let sheet = VStack(alignment: .leading, spacing: 14) {
+            ForEach(ArtworkStyle.allCases, id: \.self) { style in
+                HStack(spacing: 12) {
+                    Text(style.rawValue).font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .frame(width: 90, alignment: .leading)
+                    ForEach(titles, id: \.self) { title in
+                        FallbackArtworkView(key: title, title: title, style: style)
+                            .frame(width: 96, height: 96)
+                            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    }
+                    VStack(spacing: 6) {
+                        HStack(spacing: 6) {
+                            ForEach(titles, id: \.self) { title in
+                                FallbackArtworkView(key: title, title: title, style: style)
+                                    .frame(width: 24, height: 24)
+                                    .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+                            }
+                        }
+                        HStack(spacing: 6) {
+                            ForEach([24, 200, 280, 340, 150], id: \.self) { hue in
+                                DemoArtworkView(hue: hue, style: style)
+                                    .frame(width: 24, height: 24)
+                                    .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(Color(white: 0.93))
+        .environment(\.colorScheme, .light)
+        let renderer = ImageRenderer(content: sheet)
+        renderer.scale = 2
+        if let image = renderer.cgImage {
+            let rep = NSBitmapImageRep(cgImage: image)
+            try? rep.representation(using: .png, properties: [:])?.write(to: url)
+        }
     }
 
     /// Structure de la barre des menus (vérification des menus ajoutés).
