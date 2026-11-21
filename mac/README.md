@@ -1,5 +1,7 @@
 # KEF Remote pour macOS
 
+> English overview, screenshots and install guide: see the [main README](../README.md).
+
 Client natif SwiftUI pour piloter une enceinte KEF (LS50 Wireless II, également
 prévu pour LSX II / LSX II LT / LS60) directement sur le réseau local, sans
 passer par le client web Python du dossier parent.
